@@ -1,0 +1,273 @@
+/* ===== 공통 레이아웃 ===== */
+.screen {
+  background-color: #e3e2e2;
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  width: 100vw;
+  min-height: 100vh;
+}
+
+.screen .div {
+  background-color: #e3e2e2;
+  width: 1440px;
+  height: 1080px;
+  position: relative;
+}
+
+/* ===== 상단 우측 링크 ===== */
+.screen .text-wrapper-4 {
+  position: absolute;
+  top: 33px;
+  left: 1080px;
+  font-family: "맑은 고딕", serif;
+  font-weight: 400;
+  color: #000;
+  font-size: 15px;
+  line-height: 21px;
+  white-space: nowrap;
+}
+
+/* ===== 메인 비주얼 영역 ===== */
+.screen .overlap-group {
+  position: absolute;
+  width: 1068px;
+  height: 548px;
+  top: 174px;
+  left: 232px;
+}
+
+.screen .view {
+  width: 1068px;
+  height: 548px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.screen .overlap-group-2 {
+  position: relative;
+  width: 1068px;
+  height: 548px;
+}
+
+/* 한 장짜리 메인 이미지 */
+.screen .hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1068px;   /* 레이아웃에 맞춤 */
+  height: 548px;
+  object-fit: cover;
+  display: block;
+}
+
+/* 오른쪽 카피 텍스트 */
+.screen .view-2 {
+  width: 267px;
+  height: 151px;
+  position: absolute;
+  top: 174px;  /* 원래 디자인 기준(상단으로부터) */
+  left: 972px; /* 메인 이미지 오른쪽에 자리하도록 */
+}
+
+.screen .p {
+  position: absolute;
+  top: 115px;
+  left: 3px;
+  font-family: "Crimson Text", serif;
+  font-weight: 400;
+  color: #000;
+  font-size: 13px;
+  line-height: 18.2px;
+}
+
+.screen .div-2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: "Dhyana-Bold", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  color: #000;
+  font-size: 25px;
+  line-height: 35px;
+}
+
+.screen .text-wrapper-3 {
+  font-family: "Dhyana-Regular", Helvetica, Arial, sans-serif;
+  font-weight: 400;
+}
+
+/* ===== 검색 영역 ===== */
+.screen .group {
+  position: absolute;
+  width: 616px;
+  height: 110px;
+  top: 741px;
+  left: 413px;
+}
+
+.screen .overlap-2 {
+  position: relative;
+  width: 614px;
+  height: 110px;
+  border-radius: 100px;
+}
+
+.screen .sidebar-search-field {
+  display: flex;
+  width: 614px;
+  height: 110px;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 100px;
+}
+
+.screen .search-field {
+  display: flex;
+  align-items: center;
+  padding: 11px 16px;
+  position: relative;
+  flex: 1;
+  background-color: var(--colors-fills-secondary);
+  border-radius: 100px;
+}
+
+.screen .frame {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.screen .text-wrapper-5 {
+  font-family: "SF Pro-Regular", Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  color: var(--colors-labels-vibrant-secondary);
+  font-size: 17px;
+  letter-spacing: -0.08px;
+  line-height: 22px;
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  flex: 1;
+  font-family: "SF Pro-Regular", Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  color: #000;
+}
+
+.search-input::placeholder {
+  color: var(--colors-labels-vibrant-secondary);
+}
+
+.search-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+}
+
+.search-button:hover { opacity: 0.7; }
+
+/* 안내 텍스트 박스 (디자인용) */
+.screen .rectangle-2 {
+  position: absolute;
+  width: 68px;
+  height: 27px;
+  top: 42px;
+  left: 41px;
+  background-color: #cdcdce;
+}
+
+.screen .text-wrapper-6 {
+  position: absolute;
+  top: 44px;
+  left: 49px;
+  font-family: "SF Pro-Regular", Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  color: #828282;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+/* ===== CTA 버튼 ===== */
+.screen .overlap {
+  position: absolute;
+  width: 242px;
+  height: 72px;
+  top: 870px;
+  left: 590px;
+}
+
+.cta-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.screen .rectangle {
+  position: absolute;
+  width: 242px;
+  height: 51px;
+  top: 0;
+  left: 0;
+  background-color: #524f4f;
+  border-radius: 30px;
+  transition: background-color .15s ease;
+}
+
+.cta-button:hover .rectangle { background-color: #3d3a3a; }
+
+.cta-button:focus-visible {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+  border-radius: 30px;
+}
+
+.screen .text-wrapper-2 {
+  position: absolute;
+  top: 14px;
+  left: 40px;
+  font-family: "맑은 고딕", serif;
+  font-weight: 700;
+  color: #fff;
+  font-size: 15px;
+  line-height: 21px;
+  white-space: nowrap;
+}
+
+.screen .text-wrapper {
+  position: absolute;
+  top: 50px;
+  left: 56px;
+  font-family: "SF Pro-Regular", Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  color: #828282;
+  font-size: 10px;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+/* ===== 스크린리더 전용 ===== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
