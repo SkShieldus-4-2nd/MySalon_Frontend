@@ -1,0 +1,148 @@
+/* ShoppingCart.css */
+
+.shopping-cart-container {
+  max-width: 1000px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.cart-title-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.cart-title-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.cart-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.product-table th,
+.product-table td {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.product-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  font-size: 15px;
+}
+
+.product-item-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-align: left;
+}
+
+.product-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.product-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.product-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.product-option {
+  color: #868e96;
+  font-size: 14px;
+}
+
+.quantity-select {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #495057;
+  cursor: pointer;
+}
+
+.delete-icon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.delete-icon:hover {
+  opacity: 1;
+}
+
+.summary-section {
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 25px 30px;
+  margin-bottom: 30px;
+  border: 1px solid #eee;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 16px;
+  color: #495057;
+}
+
+.summary-row.total {
+  font-size: 20px;
+  font-weight: 700;
+  color: #A40303; /* 강조 색상 */
+  border-top: 1px solid #dee2e6;
+  padding-top: 15px;
+  margin-top: 10px;
+}
+
+.checkout-button-container {
+  text-align: center;
+}
+
+.checkout-button {
+  background-color: #A40303; /* 강조 색상 */
+  color: #fff;
+  padding: 15px 40px;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.checkout-button:hover {
+  background-color: #8e0202;
+}

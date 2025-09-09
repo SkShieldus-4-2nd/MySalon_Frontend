@@ -1,0 +1,104 @@
+/* ==================== 헤더 컨테이너 ==================== */
+.header-container {
+  display: flex;
+  justify-content: space-between; /* 좌, 중앙, 우측 요소 분배 */
+  align-items: center; /* 세로 중앙 정렬 */
+  padding: 10px 40px; /* 상하 여백 유지 */
+  background-color: transparent; /* 배경 제거 */
+  width: 100%; /* 전체 너비 사용 */
+  box-sizing: border-box; /* 패딩 포함 */
+}
+
+.header-left-placeholder {
+  width: 200px; /* 좌측 공간 확보 (브랜딩과 대칭을 위해) */
+}
+
+/* ==================== 브랜딩 영역 ==================== */
+.header-branding {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.branding-logo {
+  width: 40px;
+  height: 40px;
+}
+
+/* ==================== 우측 섹션 (메뉴 + 검색) ==================== */
+.header-right-section {
+  display: flex;
+  flex-direction: column; /* 세로로 쌓기 */
+  align-items: flex-end; /* 우측 정렬 */
+  gap: 10px; /* 메뉴와 검색창 간격 */
+}
+
+/* ==================== 헤더 상단 영역 (메뉴) ==================== */
+.header-top {
+  display: flex;
+  justify-content: flex-end; /* 우측 정렬 */
+  align-items: center;
+  width: 100%; /* 부모 너비에 맞춤 */
+}
+
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  margin-right: 15px; /* 메뉴 아이콘과 메뉴 간격 */
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 25px; /* 아이콘과 메뉴 간격 */
+}
+
+.top-menu {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  font-size: 15px;
+  color: #495057;
+  font-weight: 500;
+}
+
+.top-menu a:hover {
+  color: #000;
+}
+
+/* ==================== 헤더 하단 영역 (검색창) ==================== */
+.header-bottom {
+  display: flex;
+  justify-content: flex-end; /* 우측 정렬 */
+  width: 100%; /* 부모 너비에 맞춤 */
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background-color: #fff; /* 검색창은 흰색 유지 */
+  border: 1px solid #dee2e6; /* 테두리 추가 */
+  padding: 10px 20px;
+  border-radius: 50px;
+  width: 280px; /* 너비 축소 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.search-box input {
+  border: none;
+  background: none;
+  outline: none;
+  width: 100%;
+  margin: 0 10px;
+  font-size: 15px;
+}
+
+.search-icon, .mic-icon {
+  font-size: 18px;
+  color: #868e96;
+  cursor: pointer;
+}
