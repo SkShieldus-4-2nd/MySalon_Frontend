@@ -15,6 +15,7 @@ import { Screen as ReviewPage } from "./routes/ReviewPage/screens/Screen";
 import { Screen as WishlistPage } from "./routes/WishlistPage/screens/Screen";
 import { Screen as CartPage } from "./routes/CartPage/screens/Screen";
 import { Screen as PaymentPage } from "./routes/PaymentPage/screens/Screen";
+import { Screen as TopPage } from "./routes/TopPage/screens/Screen";
 import { Screen as OuterPage } from "./routes/OuterPage/screens/Screen";
 import { Screen as PantsPage } from "./routes/PantsPage/screens/Screen";
 import { Screen as DressPage } from "./routes/DressPage/screens/Screen";
@@ -27,7 +28,7 @@ import { Screen as MyReviewsPage } from "./routes/Screen108/screens/Screen";
 import { Screen as LoginPage } from "./routes/Screen113/screens/Screen";
 import { Screen as Screen120 } from "./routes/Screen120/screens/Screen";
 import { Screen as Screen126 } from "./routes/Screen126/screens/Screen";
-import { Screen as Screen133 } from "./routes/Screen133/screens/Screen";
+import { Screen as Screen133, Screen } from './routes/Screen133/screens/Screen';
 import { Screen as Screen145 } from "./routes/Screen145/screens/Screen";
 import { ScrollContainer } from "./components/ScrollContainer";
 
@@ -50,7 +51,7 @@ function App() {
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/payment" element={<PaymentPage />} />
-        <Route path="/category/상의" element={<Screen39 />} />
+        <Route path="/category/상의" element={<TopPage />} />
         <Route path="/category/아우터" element={<OuterPage />} />
         <Route path="/category/바지" element={<PantsPage />} />
         <Route path="/category/원피스/스커트" element={<DressPage />} />

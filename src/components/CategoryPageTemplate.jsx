@@ -59,6 +59,7 @@ const genderMap = {
   남자: "MALE",
   여자: "FEMALE",
   공용: "UNISEX",
+  전체: null,
 };
 
 export const CategoryPageTemplate = ({ categoryName, categoryTabs }) => {
@@ -140,7 +141,7 @@ export const CategoryPageTemplate = ({ categoryName, categoryTabs }) => {
 
           {/* 성별 필터 */}
           <div className="flex gap-4 mb-[40px]">
-            {["남자", "여자", "공용"].map((gender) => (
+            {["전체", "남자", "여자", "공용", ].map((gender) => (
               <Button
                 key={gender}
                 variant="ghost"
