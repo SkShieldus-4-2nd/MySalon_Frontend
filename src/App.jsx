@@ -53,9 +53,9 @@ function App() {
         <Route path="/category/상의" element={<Screen39 />} />
         <Route path="/category/아우터" element={<OuterPage />} />
         <Route path="/category/바지" element={<PantsPage />} />
-        <Route path="/category/원피스" element={<DressPage />} />
-        <Route path="/category/악세사리" element={<AccessoryPage />} />
-        <Route path="/category/홈웨어" element={<HomewearPage />} />
+        <Route path="/category/원피스/스커트" element={<DressPage />} />
+        <Route path="/category/ACC/BAG" element={<AccessoryPage />} />
+        <Route path="/category/홈웨어/속옷" element={<HomewearPage />} />
         <Route path="/category/키즈" element={<KidsPage />} />
         <Route path="/profile-edit" element={<ProfileEditPage />} />
         <Route path="/screen101" element={<Screen101 />} />

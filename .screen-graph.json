@@ -1,1 +1,13 @@
-{"nodes":[],"edges":[]}
+{
+  "nodes": [
+    {
+      "id": "src/components/ScrollContainer.jsx",
+      "label": "ScrollContainer",
+      "routes": [
+        "/"
+      ],
+      "isRoot": true
+    }
+  ],
+  "edges": []
+}
