@@ -12,16 +12,16 @@ export const Screen = () => {
 
   const handleSubmit = () => {
     // Handle signup logic here
-    alert('회원가입이 완료되었습니다!');
-    navigate('/');
+    alert("회원가입이 완료되었습니다!");
+    navigate("/");
   };
 
   const navigationItems = [
-    { name: "로그인", onClick: () => navigate('/login') },
-    { name: "회원가입", onClick: () => navigate('/signup') },
-    { name: "장바구니", onClick: () => navigate('/') },
-    { name: "마이페이지", onClick: () => navigate('/') },
-    { name: "커뮤니티", onClick: () => navigate('/') },
+    { name: "로그인", onClick: () => navigate("/login") },
+    { name: "회원가입", onClick: () => navigate("/signup") },
+    { name: "장바구니", onClick: () => navigate("/") },
+    { name: "마이페이지", onClick: () => navigate("/") },
+    { name: "커뮤니티", onClick: () => navigate("/") },
   ];
 
   return (
@@ -67,6 +67,7 @@ export const Screen = () => {
 
           <Separator className="absolute w-[1115px] h-px top-[352px] left-[195px] bg-gray-300" />
 
+          {/* 역할 선택 */}
           <RadioGroup
             className="absolute top-[311px] left-[372px]"
             value={userType}
@@ -83,7 +84,7 @@ export const Screen = () => {
                   htmlFor="buyer"
                   className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
                 >
-                  판매자
+                  구매자
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
@@ -96,7 +97,7 @@ export const Screen = () => {
                   htmlFor="seller"
                   className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
                 >
-                  구매자
+                  판매자
                 </Label>
               </div>
             </div>
@@ -275,23 +276,25 @@ export const Screen = () => {
               </div>
             </div>
 
-            <div className="absolute w-[116px] h-[30px] top-[980px] left-[441px]">
+            {/* ▶ 스토어 이름: 라벨 옆에 네모 입력박스(한 줄) */}
+            <div className="absolute top-[980px] left-[441px] flex items-center gap-4">
               <Label
                 htmlFor="storeName"
-                className={`w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-xl leading-7 text-center tracking-[0] whitespace-nowrap ${
-                  userType === "seller" ? "text-[#999999]" : "text-black"
+                className={`w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-xl leading-7 text-right tracking-[0] whitespace-nowrap ${
+                  userType === "seller" ? "text-black" : "text-[#999999]"
                 }`}
               >
                 스토어 이름
               </Label>
+
               <Input
                 id="storeName"
-              disabled={userType === "seller"}
-              className={`top-[979px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid rounded-none ${
-                userType === "seller" 
-                  ? "border-[#d0d0d0] bg-[#f5f5f5] text-[#999999] cursor-not-allowed" 
-                  : "border-[#828282] bg-white"
-              }`}
+                disabled={userType !== "seller"}  // 판매자만 활성화
+                className={`w-[398px] h-8 border-[0.6px] rounded-none ${
+                  userType === "seller"
+                    ? "border-[#828282] bg-white"
+                    : "border-[#d0d0d0] bg-[#f5f5f5] text-[#999999] cursor-not-allowed"
+                }`}
               />
             </div>
           </section>
@@ -300,19 +303,19 @@ export const Screen = () => {
             <Button
               variant="outline"
               className="absolute w-[242px] h-[60px] top-0 left-0 border border-solid border-[#828282] rounded-none bg-white hover:bg-gray-50 h-auto"
-              onClick={() => navigate('/mypage')}
+              onClick={() => navigate("/mypage")}
             >
               <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
                 취소
               </span>
             </Button>
 
-            <Button 
+            <Button
               className="absolute w-[242px] h-[60px] top-0 left-[293px] bg-[#828282] hover:bg-[#707070] rounded-none h-auto"
               onClick={handleSubmit}
             >
               <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-white text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
-                수정하기
+                가입하기
               </span>
             </Button>
           </div>

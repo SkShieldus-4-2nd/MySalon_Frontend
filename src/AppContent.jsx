@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+
 import { Screen as MainScreen } from "./screens/Screen/Screen";
 import { Screen as ShopScreen } from "./routes/Screen/screens/Screen";
 import { Screen as MenuScreen } from "./routes/Screen7/screens/Screen";
@@ -30,18 +31,24 @@ import { Screen as Screen126 } from "./routes/Screen126/screens/Screen";
 import { Screen as Screen133 } from "./routes/Screen133/screens/Screen";
 import { Screen as Screen145 } from "./routes/Screen145/screens/Screen";
 import { Screen as AdminMyPage } from "./routes/AdminMyPage/screens/Screen";
+
 import { Screen as CommunityPage } from "./routes/CommunityPage/screens/Screen";
 import { DivWrapper as BoardPage } from "./routes/DivWrapper/screens/DivWrapper";
-import { Screen as PostWritePage } from "./routes/Screen162/screens/Screen";
+
 import { Screen as PostDetailPage } from "./routes/Screen168/screens/Screen";
 import { Screen as MalePage } from "./routes/MalePage/screens/Screen";
 import { Screen as FemalePage } from "./routes/FemalePage/screens/Screen";
+
 import { ScrollContainer } from "./components/ScrollContainer";
+
+// ✅ 코디 등록하기(두 번째 페이지)
+import { Frame as OutfitWritePage } from "./routes/Frame/screens/Frame.jsx";
 
 function AppContent() {
   return (
     <Routes>
       <Route path="/" element={<ScrollContainer />} />
+
       <Route path="/shop" element={<ShopScreen />} />
       <Route path="/menu" element={<MenuScreen />} />
       <Route path="/screen14" element={<Screen14 />} />
@@ -49,6 +56,7 @@ function AppContent() {
       <Route path="/screen27" element={<Screen27 />} />
       <Route path="/screen34" element={<Screen34 />} />
       <Route path="/screen39" element={<Screen39 />} />
+
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/order-history" element={<OrderHistory />} />
@@ -56,6 +64,7 @@ function AppContent() {
       <Route path="/wishlist" element={<WishlistPage />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/payment" element={<PaymentPage />} />
+
       <Route path="/category/상의" element={<Screen39 />} />
       <Route path="/category/아우터" element={<OuterPage />} />
       <Route path="/category/바지" element={<PantsPage />} />
@@ -65,6 +74,7 @@ function AppContent() {
       <Route path="/category/키즈" element={<KidsPage />} />
       <Route path="/category/남성" element={<MalePage />} />
       <Route path="/category/여성" element={<FemalePage />} />
+
       <Route path="/profile-edit" element={<ProfileEditPage />} />
       <Route path="/screen101" element={<Screen101 />} />
       <Route path="/my-reviews" element={<MyReviewsPage />} />
@@ -74,9 +84,14 @@ function AppContent() {
       <Route path="/screen133" element={<Screen133 />} />
       <Route path="/screen145" element={<Screen145 />} />
       <Route path="/admin-mypage" element={<AdminMyPage />} />
+
+      {/* 1) 커뮤니티(첫 화면) / 2) 게시판 목록 */}
       <Route path="/community" element={<CommunityPage />} />
       <Route path="/board" element={<BoardPage />} />
-      <Route path="/write-post" element={<PostWritePage />} />
+
+      {/* 3) 코디 등록하기: Frame.jsx 만 매핑 */}
+      <Route path="/write-post" element={<OutfitWritePage />} />
+
       <Route path="/post/:id" element={<PostDetailPage />} />
     </Routes>
   );

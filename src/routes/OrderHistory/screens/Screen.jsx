@@ -26,9 +26,17 @@ export const Screen = () => {
       image: "https://c.animaapp.com/mfesdo86fPZLzd/img/image-1-2.png",
       primaryButton: "리뷰작성",
       secondaryButton: "배송현황",
+      review: {
+        rating: 4,
+        content: "시원하고 예뻐요!",
+        productImage: "https://c.animaapp.com/mfeskhdjLsBCWm/img/image-2.png",
+        productName: "여름블루 롱 원피스",
+        priceText: "50,000 원",
+        productCode: "123456789",
+      },
     },
     {
-      id: "123456789",
+      id: "123456780",
       name: "여름블루 롱 원피스",
       description:
         "여름에 입기 좋은 롱 원피스.. 상품 설명 상품 설명 상품 설명\n상품 설명상품 설명상품 설명상품 설명상품 설명상품 설명",
@@ -38,7 +46,7 @@ export const Screen = () => {
       secondaryButton: "배송현황",
     },
     {
-      id: "123456789",
+      id: "123456781",
       name: "여름블루 롱 원피스",
       description:
         "여름에 입기 좋은 롱 원피스.. 상품 설명 상품 설명 상품 설명\n상품 설명상품 설명상품 설명상품 설명상품 설명상품 설명",
@@ -110,9 +118,6 @@ export const Screen = () => {
           <h1 className="[font-family:'SF_Pro-Bold',Helvetica] font-bold text-black text-[40px] tracking-[0] leading-[56px]">
             주문내역
           </h1>
-          <span className="[font-family:'ABeeZee',Helvetica] font-normal text-black text-[32px] tracking-[0] leading-[44.8px]">
-            (3)
-          </span>
         </div>
 
         <div className="space-y-6">
@@ -145,17 +150,29 @@ export const Screen = () => {
                   </div>
 
                   <div className="flex flex-col gap-3 py-8">
+                    {/* 리뷰작성 */}
                     <Button
                       variant="outline"
                       className="w-[105px] h-9 border-[0.91px] border-black bg-transparent hover:bg-gray-50 [font-family:'SF_Pro-Regular',Helvetica] text-black text-[15.4px] leading-[21.6px]"
-                      onClick={() => {
-                        if (item.primaryButton === "리뷰작성") {
-                          navigate('/review');
-                        }
-                      }}
+                      onClick={() => navigate('/review')}
                     >
-                      {item.primaryButton}
+                      리뷰작성
                     </Button>
+
+                    {/* 리뷰수정: review가 있을 때만 노출 */}
+                    {item.review && (
+                      <Button
+                        variant="outline"
+                        className="w-[105px] h-9 border-[0.91px] border-black bg-transparent hover:bg-gray-50 [font-family:'SF_Pro-Regular',Helvetica] text-black text-[15.4px] leading-[21.6px]"
+                        onClick={() =>
+                          navigate(`/review?mode=edit`, {
+                            state: { review: item.review },
+                          })
+                        }
+                      >
+                        리뷰수정
+                      </Button>
+                    )}
 
                     <Button className="w-[105px] h-9 bg-[#828282] hover:bg-[#707070] [font-family:'SF_Pro-Regular',Helvetica] text-white text-[15.4px] leading-[21.6px]">
                       {item.secondaryButton}

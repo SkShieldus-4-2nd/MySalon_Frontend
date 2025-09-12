@@ -1,5 +1,7 @@
+// src/App.jsx
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+
 import { Screen as MainScreen } from "./screens/Screen/Screen";
 import { Screen as ShopScreen } from "./routes/Screen/screens/Screen";
 import { Screen as MenuScreen } from "./routes/Screen7/screens/Screen";
@@ -30,58 +32,66 @@ import { Screen as Screen126 } from "./routes/Screen126/screens/Screen";
 import { Screen as Screen133 } from "./routes/Screen133/screens/Screen";
 import { Screen as Screen145 } from "./routes/Screen145/screens/Screen";
 import { Screen as AdminMyPage } from "./routes/AdminMyPage/screens/Screen";
+
 import { Screen as CommunityPage } from "./routes/CommunityPage/screens/Screen";
 import { DivWrapper as BoardPage } from "./routes/DivWrapper/screens/DivWrapper";
-import { Screen as PostWritePage } from "./routes/Screen162/screens/Screen";
+import { Frame as OutfitWritePage } from "./routes/Frame/screens/Frame.jsx";
+
 import { Screen as PostDetailPage } from "./routes/Screen168/screens/Screen";
 import { Screen as MalePage } from "./routes/MalePage/screens/Screen";
 import { Screen as FemalePage } from "./routes/FemalePage/screens/Screen";
 import { ScrollContainer } from "./components/ScrollContainer";
+import { Screen as PostWritePage } from "./routes/Screen162/screens/Screen";
 
-function App() {
+function AppContent() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<ScrollContainer />} />
-        <Route path="/shop" element={<ShopScreen />} />
-        <Route path="/menu" element={<MenuScreen />} />
-        <Route path="/screen14" element={<Screen14 />} />
-        <Route path="/dropdown-nav" element={<Screen20 />} />
-        <Route path="/screen27" element={<Screen27 />} />
-        <Route path="/screen34" element={<Screen34 />} />
-        <Route path="/screen39" element={<Screen39 />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/mypage" element={<MyPage />} />
-        <Route path="/order-history" element={<OrderHistory />} />
-        <Route path="/review" element={<ReviewPage />} />
-        <Route path="/wishlist" element={<WishlistPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/payment" element={<PaymentPage />} />
-        <Route path="/category/상의" element={<Screen39 />} />
-        <Route path="/category/아우터" element={<OuterPage />} />
-        <Route path="/category/바지" element={<PantsPage />} />
-        <Route path="/category/원피스" element={<DressPage />} />
-        <Route path="/category/악세사리" element={<AccessoryPage />} />
-        <Route path="/category/홈웨어" element={<HomewearPage />} />
-        <Route path="/category/키즈" element={<KidsPage />} />
-        <Route path="/category/남성" element={<MalePage />} />
-        <Route path="/category/여성" element={<FemalePage />} />
-        <Route path="/profile-edit" element={<ProfileEditPage />} />
-        <Route path="/screen101" element={<Screen101 />} />
-        <Route path="/my-reviews" element={<MyReviewsPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/screen120" element={<Screen120 />} />
-        <Route path="/screen126" element="<Screen126 />" />
-        <Route path="/screen133" element="<Screen133 />" />
-        <Route path="/screen145" element="<Screen145 />" />
-        <Route path="/admin-mypage" element="<AdminMyPage />" />
-        <Route path="/community" element={<CommunityPage />} />
-        <Route path="/board" element="<BoardPage />" />
-        <Route path="/write-post" element="<PostWritePage />" />
-        <Route path="/post/:id" element="<PostDetailPage />" />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<ScrollContainer />} />
+      <Route path="/shop" element={<ShopScreen />} />
+      <Route path="/menu" element={<MenuScreen />} />
+      <Route path="/screen14" element={<Screen14 />} />
+      <Route path="/dropdown-nav" element={<Screen20 />} />
+      <Route path="/screen27" element={<Screen27 />} />
+      <Route path="/screen34" element={<Screen34 />} />
+      <Route path="/screen39" element={<Screen39 />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/mypage" element={<MyPage />} />
+      <Route path="/order-history" element={<OrderHistory />} />
+      <Route path="/review" element={<ReviewPage />} />
+      <Route path="/wishlist" element={<WishlistPage />} />
+      <Route path="/cart" element={<CartPage />} />
+      <Route path="/payment" element={<PaymentPage />} />
+
+      <Route path="/category/상의" element={<Screen39 />} />
+      <Route path="/category/아우터" element={<OuterPage />} />
+      <Route path="/category/바지" element={<PantsPage />} />
+      <Route path="/category/원피스" element={<DressPage />} />
+      <Route path="/category/악세사리" element={<AccessoryPage />} />
+      <Route path="/category/홈웨어" element={<HomewearPage />} />
+      <Route path="/category/키즈" element={<KidsPage />} />
+      <Route path="/category/남성" element={<MalePage />} />
+      <Route path="/category/여성" element={<FemalePage />} />
+
+      <Route path="/profile-edit" element={<ProfileEditPage />} />
+      <Route path="/screen101" element={<Screen101 />} />
+      <Route path="/my-reviews" element={<MyReviewsPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/screen120" element={<Screen120 />} />
+      <Route path="/screen126" element={<Screen126 />} />
+      <Route path="/screen133" element={<Screen133 />} />
+      <Route path="/screen145" element={<Screen145 />} />
+      <Route path="/admin-mypage" element={<AdminMyPage />} />
+      <Route path="/board/write" element={<PostWritePage />} />
+
+      {/* 커뮤니티(1번 화면) / 게시판(2번 화면) / 코디 등록(3번 화면) */}
+      <Route path="/community" element={<CommunityPage />} />
+      <Route path="/board" element={<BoardPage />} />
+      <Route path="/write-post" element={<OutfitWritePage />} />
+
+      {/* 예시: 게시글 상세 */}
+      <Route path="/post/:id" element={<PostDetailPage />} />
+    </Routes>
   );
 }
 
-export default App;
+export default AppContent;

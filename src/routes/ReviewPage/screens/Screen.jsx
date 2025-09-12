@@ -1,6 +1,6 @@
-import { Edit3Icon, MenuIcon, SearchIcon, UploadIcon } from "lucide-react";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Edit3Icon, MenuIcon, SearchIcon, UploadIcon, Star } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -8,8 +8,22 @@ import { Textarea } from "../components/ui/textarea";
 
 export const Screen = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isEdit = new URLSearchParams(location.search).get("mode") === "edit";
+  const passedReview = location.state?.review || null;
+
+  // ⭐ 요구사항: 작성/수정 모두 0점(빈 별 5개)에서 시작
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
+
+  // 수정 모드에서도 별점은 0으로 시작. (원하면 내용만 미리 채우기)
+  useEffect(() => {
+    if (isEdit && passedReview) {
+      // 별점은 0 유지
+      // 내용만 불러오고 싶으면 주석 해제:
+      // setReviewText(passedReview.content ?? "");
+    }
+  }, [isEdit, passedReview]);
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
@@ -19,43 +33,17 @@ export const Screen = () => {
     { name: "커뮤니티", onClick: () => navigate('/') },
   ];
 
-  const starImages = [
-    {
-      empty: "https://c.animaapp.com/mfeskhdjLsBCWm/img/christmas-ornament-13116937-1.png",
-      filled: "https://c.animaapp.com/mfeskhdjLsBCWm/img/favorite-4574735-1.png"
-    },
-    {
-      empty: "https://c.animaapp.com/mfeskhdjLsBCWm/img/christmas-ornament-13116937-2.png",
-      filled: "https://c.animaapp.com/mfeskhdjLsBCWm/img/favorite-4574735-1.png"
-    },
-    {
-      empty: "https://c.animaapp.com/mfeskhdjLsBCWm/img/christmas-ornament-13116937-3.png",
-      filled: "https://c.animaapp.com/mfeskhdjLsBCWm/img/favorite-4574735-1.png"
-    },
-    {
-      empty: "https://c.animaapp.com/mfeskhdjLsBCWm/img/christmas-ornament-13116937-4.png",
-      filled: "https://c.animaapp.com/mfeskhdjLsBCWm/img/favorite-4574735-1.png"
-    },
-    {
-      empty: "https://c.animaapp.com/mfeskhdjLsBCWm/img/christmas-ornament-13116937-1.png",
-      filled: "https://c.animaapp.com/mfeskhdjLsBCWm/img/favorite-4574735-1.png"
-    }
-  ];
-
-  const handleStarClick = (starIndex) => {
-    setRating(starIndex + 1);
-  };
-
   const handleSubmit = () => {
-    if (rating === 0) {
-      alert('별점을 선택해주세요.');
-      return;
+    if (rating === 0) return alert('별점을 선택해주세요.');
+    if (!reviewText.trim()) return alert('리뷰 내용을 작성해주세요.');
+
+    if (isEdit) {
+      // TODO: PUT /reviews/:id
+      alert('리뷰가 수정되었습니다!');
+    } else {
+      // TODO: POST /reviews
+      alert('리뷰가 등록되었습니다!');
     }
-    if (!reviewText.trim()) {
-      alert('리뷰 내용을 작성해주세요.');
-      return;
-    }
-    alert('리뷰가 등록되었습니다!');
     navigate('/order-history');
   };
 
@@ -82,11 +70,9 @@ export const Screen = () => {
             <div className="absolute w-[142px] top-3 left-0 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[25.5px] text-center tracking-[0] leading-[35.8px] whitespace-nowrap">
               MY SALON
             </div>
-
             <div className="absolute w-[87px] top-0 left-7 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[9.5px] text-center tracking-[0] leading-[13.3px] whitespace-nowrap">
               당신만을 위한 옷장
             </div>
-
             <img
               className="absolute w-[66px] h-[66px] top-[52px] left-[37px]"
               alt="Main icon"
@@ -106,7 +92,7 @@ export const Screen = () => {
         <div className="absolute w-[223px] h-14 top-[238px] left-[197px]">
           <Edit3Icon className="absolute w-[34px] h-[34px] top-[11px] left-[234px]" />
           <h1 className="absolute top-0 left-0 [font-family:'SF_Pro-Bold',Helvetica] font-bold text-black text-[40px] text-center tracking-[0] leading-[56px] whitespace-nowrap">
-            리뷰작성하기
+            {isEdit ? "리뷰수정하기" : "리뷰작성하기"}
           </h1>
         </div>
 
@@ -115,42 +101,44 @@ export const Screen = () => {
             <img
               className="absolute w-[162px] h-[216px] top-[67px] left-[103px] object-cover"
               alt="Image"
-              src="https://c.animaapp.com/mfeskhdjLsBCWm/img/image-2.png"
+              src={passedReview?.productImage || "https://c.animaapp.com/mfeskhdjLsBCWm/img/image-2.png"}
             />
 
             <div className="absolute top-[83px] left-[295px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[23px] text-center tracking-[0] leading-[32.2px] whitespace-nowrap">
-              여름블루 롱 원피스
+              {passedReview?.productName || "여름블루 롱 원피스"}
             </div>
 
             <div className="absolute top-[132px] left-[295px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[25px] text-center tracking-[0] leading-[35px] whitespace-nowrap">
-              50,000 원
+              {passedReview?.priceText || "50,000 원"}
             </div>
 
             <div className="absolute top-[66px] left-[295px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-xs tracking-[0] leading-[16.8px] whitespace-nowrap">
-              123456789
+              {passedReview?.productCode || "123456789"}
             </div>
 
-            {/* Interactive Star Rating */}
-            <div className="absolute w-[341px] h-[61px] top-[194px] left-[295px]">
-              {starImages.map((star, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleStarClick(index)}
-                  className={`absolute w-[61px] h-[57px] cursor-pointer hover:scale-110 transition-transform ${
-                    index === 0 ? 'top-[3px] left-0' :
-                    index === 1 ? 'top-[3px] left-[70px]' :
-                    index === 2 ? 'top-0.5 left-[141px]' :
-                    index === 3 ? 'top-1 left-[211px]' :
-                    'top-0 left-[282px]'
-                  }`}
-                >
-                  <img
-                    className="w-full h-full object-cover"
-                    alt={`Star ${index + 1}`}
-                    src={rating > index ? star.filled : star.empty}
-                  />
-                </button>
-              ))}
+            {/* ⭐ 별점: 0점(회색 아웃라인 5개) → n번째 클릭 시 1~n 빨간 채움 */}
+            <div className="absolute top-[194px] left-[295px] flex gap-[9px]">
+              {[1, 2, 3, 4, 5].map((n) => {
+                const filled = rating >= n;
+                return (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setRating(n)}
+                    className="w-[61px] h-[57px] hover:scale-110 transition-transform"
+                    aria-label={`${n}점`}
+                  >
+                    <Star
+                      width={57}
+                      height={57}
+                      className={filled ? "text-red-500" : "text-gray-300"}
+                      fill={filled ? "currentColor" : "none"}
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    />
+                  </button>
+                );
+              })}
             </div>
 
             <Textarea
@@ -186,7 +174,7 @@ export const Screen = () => {
                 onClick={handleSubmit}
               >
                 <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-white text-xl text-center tracking-[0] leading-7">
-                  등록하기
+                  {isEdit ? "수정하기" : "등록하기"}
                 </span>
               </Button>
             </div>

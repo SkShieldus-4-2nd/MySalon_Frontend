@@ -17,16 +17,11 @@ export const Screen = () => {
   ];
 
   const reviewSections = [
-    {
-      title: "작성한 리뷰",
-      className: "top-[429px]",
-    },
-    {
-      title: "리뷰를 작성해보세요",
-      className: "top-[739px]",
-    },
+    { title: "작성한 리뷰", className: "top-[429px]" },
+    { title: "리뷰를 작성해보세요", className: "top-[739px]" },
   ];
 
+  // ⚠️ 여기 아이템 구조는 ReviewPage로 넘길 데이터의 source가 됨
   const reviewItems = [
     {
       id: "123456789",
@@ -36,6 +31,10 @@ export const Screen = () => {
       buttonText: "리뷰수정",
       topPosition: "top-[531px]",
       idTopPosition: "top-[528px]",
+      // 선택사항: 수정 페이지에서 활용할 수 있는 필드(초기 별점/이미지 등)
+      price: "50,000 원",
+      rating: 4,
+      imageUrl: "https://c.animaapp.com/mfewlpnp6b6Q4Z/img/image-2.png",
     },
     {
       id: "123456789",
@@ -46,8 +45,20 @@ export const Screen = () => {
       buttonText: "리뷰작성",
       topPosition: "top-[832px]",
       idTopPosition: "top-[829px]",
+      imageUrl: "https://c.animaapp.com/mfewlpnp6b6Q4Z/img/image-2.png",
     },
   ];
+
+  // ✅ 리뷰작성/리뷰수정 공용 핸들러
+  const handleReviewAction = (item) => {
+    if (item.buttonText === "리뷰수정") {
+      // 수정 모드로 이동 + 현재 리뷰 데이터를 함께 전달
+      navigate('/review?mode=edit', { state: { review: item } });
+    } else {
+      // 작성 모드
+      navigate('/review');
+    }
+  };
 
   return (
     <div className="bg-white grid justify-items-center [align-items:start] w-screen">
@@ -99,7 +110,7 @@ export const Screen = () => {
             </div>
           </div>
 
-          <Button 
+          <Button
             className="absolute w-[58px] h-[58px] top-[15px] left-[25px] bg-neutral-100 rounded-[29px/29.18px] p-0 h-auto"
             onClick={() => navigate('/menu')}
           >
@@ -137,7 +148,7 @@ export const Screen = () => {
               <img
                 className={`${item.topPosition} absolute w-[119px] h-[159px] left-[247px] object-cover`}
                 alt="Image"
-                src="https://c.animaapp.com/mfewlpnp6b6Q4Z/img/image-2.png"
+                src={item.imageUrl || "https://c.animaapp.com/mfewlpnp6b6Q4Z/img/image-2.png"}
               />
 
               <div
@@ -152,9 +163,7 @@ export const Screen = () => {
                 {item.description.split("\n").map((line, lineIndex) => (
                   <React.Fragment key={lineIndex}>
                     {line}
-                    {lineIndex < item.description.split("\n").length - 1 && (
-                      <br />
-                    )}
+                    {lineIndex < item.description.split("\n").length - 1 && <br />}
                   </React.Fragment>
                 ))}
               </div>
@@ -167,11 +176,7 @@ export const Screen = () => {
 
               <Button
                 className={`absolute w-[107px] h-9 ${item.topPosition === "top-[531px]" ? "top-[589px]" : "top-[890px]"} left-[1081px] bg-[#828282] hover:bg-[#707070] h-auto`}
-                onClick={() => {
-                  if (item.buttonText === "리뷰작성") {
-                    navigate('/review');
-                  }
-                }}
+                onClick={() => handleReviewAction(item)}  // ✅ 여기만 누르면 분기
               >
                 <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-white text-[15.4px] tracking-[0] leading-[21.6px]">
                   {item.buttonText}
