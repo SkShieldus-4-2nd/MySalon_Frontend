@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -8,18 +8,20 @@ import { Separator } from "../components/ui/separator";
 
 export const Screen = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+
   const [formData, setFormData] = useState({
     userId: "HONG1234",
     password: "",
     passwordConfirm: "",
     paymentPassword: "",
     name: "홍길동",
-    phone: "01012345678",
     gender: "male",
     height: "180",
     weight: "70",
     storeName: "",
-    userType: "buyer"
+    userType: "buyer",
+    profileImageUrl: "" // ▶ 프로필 사진 미리보기 URL
   });
 
   const navigationItems = [
@@ -32,6 +34,13 @@ export const Screen = () => {
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setFormData(prev => ({ ...prev, profileImageUrl: url }));
   };
 
   const handleSubmit = () => {
@@ -86,6 +95,7 @@ export const Screen = () => {
 
           <Separator className="absolute w-[1115px] h-px top-[352px] left-[195px] bg-gray-300" />
 
+          {/* 역할 선택 */}
           <RadioGroup
             className="absolute top-[311px] left-[372px]"
             value={formData.userType}
@@ -126,6 +136,7 @@ export const Screen = () => {
               기본정보
             </h3>
 
+            {/* 아이디 */}
             <div className="absolute top-[493px] left-[471px]">
               <Label
                 htmlFor="username"
@@ -141,6 +152,7 @@ export const Screen = () => {
               className="top-[492px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
             />
 
+            {/* 비밀번호 */}
             <div className="absolute top-[553px] left-[462px]">
               <Label
                 htmlFor="password"
@@ -157,6 +169,7 @@ export const Screen = () => {
               className="top-[554px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
             />
 
+            {/* 비밀번호 확인 */}
             <div className="absolute top-[613px] left-[441px]">
               <Label
                 htmlFor="passwordConfirm"
@@ -178,6 +191,7 @@ export const Screen = () => {
               </div>
             )}
 
+            {/* 결제 비밀번호 */}
             <div className="absolute top-[673px] left-[441px]">
               <Label
                 htmlFor="paymentPassword"
@@ -197,6 +211,7 @@ export const Screen = () => {
               />
             </div>
 
+            {/* 이름 */}
             <div className="absolute top-[733px] left-[437px]">
               <Label
                 htmlFor="name"
@@ -212,25 +227,47 @@ export const Screen = () => {
               className="top-[734px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
             />
 
+            {/* ✅ 전화번호 줄을 → 프로필 사진 + 사진 업로드 버튼으로 교체 */}
             <div className="absolute top-[794px] left-[462px]">
-              <Label
-                htmlFor="phone"
-                className="w-[74px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                전화번호
+              <Label className="w-[74px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
+                프로필 사진
               </Label>
             </div>
-            <div className="absolute w-[398px] h-8 top-[793px] left-[606px] border-[0.6px] border-solid border-[#828282]">
-              <Input
-                id="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                placeholder="- 없이 입력하세요."
-                className="w-full h-full border-none rounded-none [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#999999] text-[10px] leading-[14px] text-center tracking-[0]"
-              />
-            </div>
+            <div className="absolute top-[792px] left-[606px] flex items-center gap-3">
+              {/* 미리보기 영역 */}
+              {formData.profileImageUrl ? (
+                <img
+                  src={formData.profileImageUrl}
+                  alt="프로필 미리보기"
+                  className="w-10 h-10 rounded-full object-cover border border-[#d9d9d9]"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full border border-[#d9d9d9] bg-[#f5f5f5] flex items-center justify-center text-[10px] text-[#777]">
+                  사진
+                </div>
+              )}
 
+              {/* 숨김 파일 입력 */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+
+              {/* 업로드 버튼 */}
+              <Button
+                variant="outline"
+                className="h-8 px-3 rounded-[6px] border-[0.6px] border-[#828282] text-[12px] bg-white hover:bg-gray-50"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                사진 업로드
+              </Button>
+            </div>
+            {/* ✅ 여기까지 대체 */}
+
+            {/* 성별 */}
             <div className="absolute top-[854px] left-[481px]">
               <Label className="w-[37px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
                 성별
@@ -271,6 +308,7 @@ export const Screen = () => {
               </div>
             </RadioGroup>
 
+            {/* 키 */}
             <div className="absolute top-[917px] left-[481px]">
               <Label
                 htmlFor="height"
@@ -292,6 +330,7 @@ export const Screen = () => {
               </div>
             </div>
 
+            {/* 몸무게 */}
             <div className="absolute top-[914px] left-[773px]">
               <Label
                 htmlFor="weight"
@@ -313,6 +352,7 @@ export const Screen = () => {
               </div>
             </div>
 
+            {/* 스토어 이름 */}
             <div className="absolute w-[116px] h-[30px] top-[980px] left-[441px]">
               <Label
                 htmlFor="storeName"
@@ -328,14 +368,15 @@ export const Screen = () => {
                 onChange={(e) => handleInputChange('storeName', e.target.value)}
                 disabled={formData.userType === "seller"}
                 className={`absolute top-[-1px] left-[165px] w-[398px] h-8 border-[0.6px] border-solid rounded-none ${
-                  formData.userType === "seller" 
-                    ? "border-[#d0d0d0] bg-[#f5f5f5] text-[#999999] cursor-not-allowed" 
+                  formData.userType === "seller"
+                    ? "border-[#d0d0d0] bg-[#f5f5f5] text-[#999999] cursor-not-allowed"
                     : "border-[#828282] bg-white"
                 }`}
               />
             </div>
           </section>
 
+          {/* 하단 버튼 */}
           <div className="absolute w-[539px] h-[60px] top-[1049px] left-[466px]">
             <Button
               variant="outline"
@@ -347,7 +388,7 @@ export const Screen = () => {
               </span>
             </Button>
 
-            <Button 
+            <Button
               className="absolute w-[242px] h-[60px] top-0 left-[293px] bg-[#828282] hover:bg-[#707070] rounded-none h-auto"
               onClick={handleSubmit}
             >
