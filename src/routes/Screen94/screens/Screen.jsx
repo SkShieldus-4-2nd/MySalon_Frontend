@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -8,19 +9,23 @@ import { Separator } from "../components/ui/separator";
 
 export const Screen = () => {
   const navigate = useNavigate();
+  const userNum = 4; // 예시: 로그인된 유저 번호
+
   const [formData, setFormData] = useState({
-    userId: "HONG1234",
+    userId: "",
     password: "",
     passwordConfirm: "",
     paymentPassword: "",
-    name: "홍길동",
-    phone: "01012345678",
-    gender: "male",
-    height: "180",
-    weight: "70",
+    name: "",
+    phone: "",
+    gender: "MALE",
+    height: "",
+    weight: "",
     storeName: "",
-    userType: "buyer"
+    userType: "BUYER"
   });
+
+  const [loading, setLoading] = useState(true);
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
@@ -34,14 +39,66 @@ export const Screen = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = () => {
-    if (formData.password !== formData.passwordConfirm) {
+  // ✅ 1. 페이지 로드 시 API로 유저 정보 가져오기
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/api/users/${userNum}`);
+        const user = res.data;
+        setFormData({
+          userId: user.id || "",
+          password: "",
+          passwordConfirm: "",
+          paymentPassword: "", // API에 없으므로 빈 문자열
+          name: user.userName || "",
+          phone: "", // API에 없으므로 빈 문자열
+          gender: user.gender || "MALE", // null이면 male로 기본값
+          height: user.height || "",
+          weight: user.weight || "",
+          storeName: user.storeName || "",
+          userType: user.type || "BUYER"
+        });
+        setLoading(false);
+      } catch (error) {
+        console.error("사용자 정보 로드 실패:", error);
+        alert("사용자 정보를 가져오는데 실패했습니다.");
+      }
+    };
+
+    fetchUser();
+  }, [userNum]);
+
+  // ✅ 2. 수정하기 API 호출
+  const handleSubmit = async () => {
+    if (formData.password && formData.password !== formData.passwordConfirm) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-    alert('프로필이 수정되었습니다!');
-    navigate('/mypage');
+
+    try {
+      await axios.put(`http://localhost:8080/api/users/${userNum}`, {
+        id: formData.userId,                 // ✅ userId → id
+        userName: formData.name,             // ✅ name → userName
+        secondPassword: formData.paymentPassword, // ✅ paymentPassword → secondPassword
+        password: formData.password,
+        phone: formData.phone,
+        gender: formData.gender,
+        tall: formData.height,
+        weight: formData.weight,
+        storeName: formData.storeName,
+        type: formData.userType
+      });
+
+      alert('프로필이 수정되었습니다!');
+      navigate('/mypage');
+    } catch (error) {
+      console.error("사용자 정보 수정 실패:", error);
+      alert('수정에 실패했습니다.');
+    }
   };
+
+  if (loading) return <div className="text-center mt-20">로딩 중...</div>;
+
 
   return (
     <div className="bg-white grid justify-items-center [align-items:start] w-screen">
@@ -94,12 +151,12 @@ export const Screen = () => {
             <div className="flex items-center space-x-[81px]">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem
-                  value="buyer"
-                  id="buyer"
+                  value="BUYER"
+                  id="BUYER"
                   className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
                 />
                 <Label
-                  htmlFor="buyer"
+                  htmlFor="BUYER"
                   className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
                 >
                   구매자
@@ -107,12 +164,12 @@ export const Screen = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem
-                  value="seller"
-                  id="seller"
+                  value="SELLER"
+                  id="SELLER"
                   className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
                 />
                 <Label
-                  htmlFor="seller"
+                  htmlFor="SELLER"
                   className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
                 >
                   판매자
@@ -316,9 +373,8 @@ export const Screen = () => {
             <div className="absolute w-[116px] h-[30px] top-[980px] left-[441px]">
               <Label
                 htmlFor="storeName"
-                className={`w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-xl leading-7 text-center tracking-[0] whitespace-nowrap ${
-                  formData.userType === "seller" ? "text-[#999999]" : "text-black"
-                }`}
+                className={`w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-xl leading-7 text-center tracking-[0] whitespace-nowrap ${formData.userType === "seller" ? "text-[#999999]" : "text-black"
+                  }`}
               >
                 스토어 이름
               </Label>
@@ -326,13 +382,13 @@ export const Screen = () => {
                 id="storeName"
                 value={formData.storeName}
                 onChange={(e) => handleInputChange('storeName', e.target.value)}
-                disabled={formData.userType === "seller"}
-                className={`absolute top-[-1px] left-[165px] w-[398px] h-8 border-[0.6px] border-solid rounded-none ${
-                  formData.userType === "seller" 
-                    ? "border-[#d0d0d0] bg-[#f5f5f5] text-[#999999] cursor-not-allowed" 
-                    : "border-[#828282] bg-white"
-                }`}
+                disabled={formData.userType !== "SELLER"} // ← 여기를 수정
+                className={`absolute top-[-1px] left-[165px] w-[398px] h-8 border-[0.6px] border-solid rounded-none ${formData.userType !== "SELLER"
+                  ? "border-[#d0d0d0] bg-[#f5f5f5] text-[#999999] cursor-not-allowed"
+                  : "border-[#828282] bg-white"
+                  }`}
               />
+
             </div>
           </section>
 
@@ -347,7 +403,7 @@ export const Screen = () => {
               </span>
             </Button>
 
-            <Button 
+            <Button
               className="absolute w-[242px] h-[60px] top-0 left-[293px] bg-[#828282] hover:bg-[#707070] rounded-none h-auto"
               onClick={handleSubmit}
             >
