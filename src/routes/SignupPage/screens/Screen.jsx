@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -9,6 +10,56 @@ import { Separator } from "../components/ui/separator";
 export const Screen = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState("buyer");
+  const [gender, setGender] = useState("MALE");
+
+  // 입력값 상태 관리
+  const [form, setForm] = useState({
+    id: "",
+    password: "",
+    passwordConfirm: "",
+    secondPassword: "",
+    userName: "",
+    phone: "",
+    tall: "",
+    weight: "",
+    storeName: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.id]: e.target.value });
+  };
+
+  // 회원가입 요청
+  const handleSignup = async () => {
+    if (form.password !== form.passwordConfirm) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    try {
+      const requestData = {
+        id: form.id,
+        password: form.password,
+        userName: form.userName,
+        secondPassword: form.secondPassword,
+        gender: gender === "MALE" ? "MALE" : "FEMALE",
+        tall: form.tall ? Number(form.tall) : null,
+        weight: form.weight ? Number(form.weight) : null,
+        type: userType === "buyer" ? "BUYER" : "SELLER",
+        storeName: userType === "seller" ? form.storeName : null,
+      };
+
+      const response = await axios.post("http://localhost:8080/api/users", requestData);
+
+      if (response.status === 200) {
+        alert("회원가입이 완료되었습니다!");
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
@@ -21,7 +72,8 @@ export const Screen = () => {
   return (
     <div className="bg-white grid justify-items-center [align-items:start] w-screen">
       <div className="bg-white w-[1440px] h-[1216px] relative">
-        <nav className="absolute top-[33px] left-[1080px] [font-family:'Crimson_Text',Helvetica] font-normal text-black text-[15px] tracking-[0] leading-[21px] whitespace-nowrap">
+        {/* 네비게이션 */}
+        <nav className="absolute top-[33px] left-[1080px]">
           <div className="flex gap-4">
             {navigationItems.map((item, index) => (
               <Button
@@ -36,31 +88,22 @@ export const Screen = () => {
           </div>
         </nav>
 
+        {/* 로고 */}
         <header className="absolute w-[146px] h-[118px] top-[135px] left-[649px]">
-          <div className="relative w-[142px] h-[118px]">
-            <h1 className="absolute w-[142px] top-3 left-0 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[25.5px] text-center tracking-[0] leading-[35.8px] whitespace-nowrap">
-              MY SALON
-            </h1>
-
-            <p className="w-[87px] top-0 left-7 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[9.5px] leading-[13.3px] absolute text-center tracking-[0] whitespace-nowrap">
-              당신만을 위한 옷장
-            </p>
-
-            <img
-              className="absolute w-[66px] h-[66px] top-[52px] left-[37px]"
-              alt="Main icon"
-              src="https://c.animaapp.com/mfeqluynHQoI9d/img/main-icon-1.png"
-            />
-          </div>
+          <h1 className="text-center text-[25.5px] font-normal">MY SALON</h1>
+          <p className="text-center text-[9.5px]">당신만을 위한 옷장</p>
+          <img
+            className="absolute w-[66px] h-[66px] top-[52px] left-[37px]"
+            alt="Main icon"
+            src="https://c.animaapp.com/mfeqluynHQoI9d/img/main-icon-1.png"
+          />
         </header>
 
         <main>
-          <h2 className="top-[282px] left-[195px] [font-family:'SF_Pro-Bold',Helvetica] font-bold text-[#222222] text-[40px] leading-[56px] absolute text-center tracking-[0] whitespace-nowrap">
-            회원가입
-          </h2>
-
+          <h2 className="absolute top-[282px] left-[195px] text-[40px] font-bold">회원가입</h2>
           <Separator className="absolute w-[1115px] h-px top-[352px] left-[195px] bg-gray-300" />
 
+          {/* 회원 타입 */}
           <RadioGroup
             className="absolute top-[311px] left-[372px]"
             value={userType}
@@ -68,250 +111,98 @@ export const Screen = () => {
           >
             <div className="flex items-center space-x-[81px]">
               <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="buyer"
-                  id="buyer"
-                  className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
-                />
-                <Label
-                  htmlFor="buyer"
-                  className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
-                >
-                  구매자
-                </Label>
+                <RadioGroupItem value="buyer" id="buyer" />
+                <Label htmlFor="buyer">구매자</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="seller"
-                  id="seller"
-                  className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
-                />
-                <Label
-                  htmlFor="seller"
-                  className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
-                >
-                  판매자
-                </Label>
+                <RadioGroupItem value="seller" id="seller" />
+                <Label htmlFor="seller">판매자</Label>
               </div>
             </div>
           </RadioGroup>
 
+          {/* 기본정보 */}
           <section>
-            <h3 className="top-[410px] left-[372px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[35px] leading-[49px] absolute text-center tracking-[0] whitespace-nowrap">
-              기본정보
-            </h3>
+            {/* 아이디 */}
+            <Label htmlFor="id" className="absolute top-[493px] left-[471px]">아이디</Label>
+            <Input id="id" value={form.id} onChange={handleChange}
+              className="absolute top-[492px] left-[606px] w-[398px]" />
 
-            <div className="absolute top-[493px] left-[471px]">
-              <Label
-                htmlFor="username"
-                className="w-14 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                아이디
-              </Label>
-            </div>
-            <Input
-              id="username"
-              className="top-[492px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
-            />
+            {/* 비밀번호 */}
+            <Label htmlFor="password" className="absolute top-[553px] left-[462px]">비밀번호</Label>
+            <Input id="password" type="password" value={form.password} onChange={handleChange}
+              className="absolute top-[554px] left-[606px] w-[398px]" />
 
-            <div className="absolute top-[553px] left-[462px]">
-              <Label
-                htmlFor="password"
-                className="w-[74px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                비밀번호
-              </Label>
-            </div>
-            <Input
-              id="password"
-              type="password"
-              className="top-[554px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
-            />
+            {/* 비밀번호 확인 */}
+            <Label htmlFor="passwordConfirm" className="absolute top-[613px] left-[441px]">비밀번호 확인</Label>
+            <Input id="passwordConfirm" type="password" value={form.passwordConfirm} onChange={handleChange}
+              className="absolute top-[612px] left-[606px] w-[398px]" />
 
-            <div className="absolute top-[613px] left-[441px]">
-              <Label
-                htmlFor="passwordConfirm"
-                className="w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                비밀번호 확인
-              </Label>
-            </div>
-            <Input
-              id="passwordConfirm"
-              type="password"
-              className="top-[612px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
-            />
-            <div className="top-[645px] left-[606px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[8px] leading-[11.2px] absolute text-center tracking-[0] whitespace-nowrap">
-              비밀번호가 틀렸습니다.
-            </div>
+            {/* 2차 비밀번호 */}
+            <Label htmlFor="secondPassword" className="absolute top-[673px] left-[441px]">결제 비밀번호</Label>
+            <Input id="secondPassword" type="password" placeholder="6자리 숫자"
+              value={form.secondPassword} onChange={handleChange}
+              className="absolute top-[672px] left-[606px] w-[398px]" />
 
-            <div className="absolute top-[673px] left-[441px]">
-              <Label
-                htmlFor="paymentPassword"
-                className="w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                결제 비밀번호
-              </Label>
-            </div>
-            <div className="absolute w-[398px] h-8 top-[672px] left-[606px] border-[0.6px] border-solid border-[#828282]">
-              <Input
-                id="paymentPassword"
-                type="password"
-                placeholder="6자리 숫자로 입력해주세요"
-                className="w-full h-full border-none rounded-none [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-xs leading-[16.8px] text-center tracking-[0]"
-              />
-            </div>
+            {/* 닉네임 */}
+            <Label htmlFor="userName" className="absolute top-[733px] left-[437px]">이름(닉네임)</Label>
+            <Input id="userName" value={form.userName} onChange={handleChange}
+              className="absolute top-[734px] left-[606px] w-[398px]" />
 
-            <div className="absolute top-[733px] left-[437px]">
-              <Label
-                htmlFor="name"
-                className="w-[125px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                이름(닉네임)
-              </Label>
-            </div>
-            <Input
-              id="name"
-              className="top-[734px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
-            />
+            {/* 전화번호 */}
+            <Label htmlFor="phone" className="absolute top-[794px] left-[462px]">전화번호</Label>
+            <Input id="phone" value={form.phone} onChange={handleChange}
+              className="absolute top-[793px] left-[606px] w-[398px]" />
 
-            <div className="absolute top-[794px] left-[462px]">
-              <Label
-                htmlFor="phone"
-                className="w-[74px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                전화번호
-              </Label>
-            </div>
-            <div className="absolute w-[398px] h-8 top-[793px] left-[606px] border-[0.6px] border-solid border-[#828282]">
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="- 없이 입력하세요."
-                className="w-full h-full border-none rounded-none [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#999999] text-[10px] leading-[14px] text-center tracking-[0]"
-              />
-            </div>
-
-            <div className="absolute top-[854px] left-[481px]">
-              <Label className="w-[37px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
-                성별
-              </Label>
-            </div>
+            {/* 성별 */}
+            <Label className="absolute top-[854px] left-[481px]">성별</Label>
             <RadioGroup
-              className="absolute w-[184px] h-[22px] top-[859px] left-[606px]"
-              defaultValue="male"
+              className="absolute top-[859px] left-[606px]"
+              value={gender}
+              onValueChange={setGender}
             >
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem
-                    value="male"
-                    id="male"
-                    className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
-                  />
-                  <Label
-                    htmlFor="male"
-                    className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
-                  >
-                    남자
-                  </Label>
+              <div className="flex space-x-6">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="MALE" id="male" />
+                  <Label htmlFor="male">남자</Label>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem
-                    value="female"
-                    id="female"
-                    className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
-                  />
-                  <Label
-                    htmlFor="female"
-                    className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
-                  >
-                    여자
-                  </Label>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="FEMALE" id="female" />
+                  <Label htmlFor="female">여자</Label>
                 </div>
               </div>
             </RadioGroup>
 
-            <div className="absolute top-[917px] left-[481px]">
-              <Label
-                htmlFor="height"
-                className="w-[37px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                키
-              </Label>
-            </div>
-            <div className="absolute w-32 h-8 top-[914px] left-[606px] border-[0.6px] border-solid border-[#828282]">
-              <Input
-                id="height"
-                type="number"
-                className="w-full h-full border-none rounded-none pr-8"
-              />
-              <div className="absolute top-1 right-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px] whitespace-nowrap">
-                cm
-              </div>
-            </div>
+            {/* 키, 몸무게 */}
+            <Label htmlFor="tall" className="absolute top-[917px] left-[481px]">키</Label>
+            <Input id="tall" type="number" value={form.tall} onChange={handleChange}
+              className="absolute top-[914px] left-[606px] w-32" />
 
-            <div className="absolute top-[914px] left-[773px]">
-              <Label
-                htmlFor="weight"
-                className="w-16 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                몸무게
-              </Label>
-            </div>
-            <div className="absolute w-32 h-8 top-[914px] left-[876px] border-[0.6px] border-solid border-[#828282]">
-              <Input
-                id="weight"
-                type="number"
-                className="w-full h-full border-none rounded-none pr-8"
-              />
-              <div className="absolute top-1 right-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px] whitespace-nowrap">
-                kg
-              </div>
-            </div>
+            <Label htmlFor="weight" className="absolute top-[914px] left-[773px]">몸무게</Label>
+            <Input id="weight" type="number" value={form.weight} onChange={handleChange}
+              className="absolute top-[914px] left-[876px] w-32" />
 
-            <div className="absolute w-[116px] h-[30px] top-[980px] left-[441px]">
-              <Label
-                htmlFor="storeName"
-                className={`w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-xl leading-7 text-center tracking-[0] whitespace-nowrap ${
-                  userType === "seller" ? "text-[#999999]" : "text-black"
-                }`}
-              >
-                스토어 이름
-              </Label>
-            </div>
-            <Input
-              id="storeName"
-              disabled={userType === "seller"}
-              className={`top-[979px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid rounded-none ${
-                userType === "seller" 
-                  ? "border-[#d0d0d0] bg-[#f5f5f5] text-[#999999] cursor-not-allowed" 
-                  : "border-[#828282] bg-white"
-              }`}
-            />
+            {/* 스토어 이름 (판매자만 활성화) */}
+            <Label htmlFor="storeName" className="absolute top-[980px] left-[441px]">스토어 이름</Label>
+            <Input id="storeName" value={form.storeName} onChange={handleChange}
+              disabled={userType === "buyer"}
+              className="absolute top-[979px] left-[606px] w-[398px]" />
           </section>
 
-          <div className="absolute w-[539px] h-[60px] top-[1049px] left-[466px]">
+          {/* 버튼 */}
+          <div className="absolute top-[1049px] left-[466px] flex gap-6">
             <Button
               variant="outline"
-              className="absolute w-[242px] h-[60px] top-0 left-0 border border-solid border-[#828282] rounded-none bg-white hover:bg-gray-50 h-auto"
-              onClick={() => navigate('/')}
+              className="w-[242px] h-[60px]"
+              onClick={() => navigate("/")}
             >
-              <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
-                취소
-              </span>
+              취소
             </Button>
-
-            <Button 
-              className="absolute w-[242px] h-[60px] top-0 left-[293px] bg-[#828282] hover:bg-[#707070] rounded-none h-auto"
-              onClick={() => {
-                // Handle signup logic here
-                alert('회원가입이 완료되었습니다!');
-                navigate('/');
-              }}
+            <Button
+              className="w-[242px] h-[60px] bg-[#828282] hover:bg-[#707070]"
+              onClick={handleSignup}
             >
-              <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-white text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
-                회원가입
-              </span>
+              회원가입
             </Button>
           </div>
         </main>
