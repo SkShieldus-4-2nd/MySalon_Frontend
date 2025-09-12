@@ -1,14 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Screen as MainScreen } from "./screens/Screen/Screen";
-import { Screen as ShopScreen } from "./routes/Screen/screens/Screen";
-import { Screen as MenuScreen } from "./routes/Screen7/screens/Screen";
-import { Screen as Screen14 } from "./routes/Screen14/screens/Screen";
-import { Screen as Screen20 } from "./routes/Screen20/screens/Screen";
+import { MainScreen } from "./screens/MainScreen/MainScreen";
+import { ShopPage as ShopScreen } from "./routes/ShopPage/screens/ShopPage";
+import { MenuPage as MenuScreen } from "./routes/MenuPage/screens/MenuPage";
+import { CategoryPage as Screen14 } from "./routes/CategoryPage/screens/CategoryPage";
+import { DropdownNavPage as Screen20 } from "./routes/DropdownNavPage/screens/DropdownNavPage";
 import { Screen as Screen27 } from "./routes/Screen27/screens/Screen";
 import { Screen as Screen34 } from "./routes/Screen34/screens/Screen";
-import { Screen as Screen39 } from "./routes/Screen39/screens/Screen";
-import { Screen as SignupPage } from "./routes/SignupPage/screens/Screen";
+import { TopPage as Screen39 } from "./routes/TopPage/screens/TopPage";
+import { SignupPage } from "./routes/SignupPage/screens/SignupPage";
 import { Screen as MyPage } from "./routes/MyPage/screens/Screen";
 import { Screen as OrderHistory } from "./routes/OrderHistory/screens/Screen";
 import { Screen as ReviewPage } from "./routes/ReviewPage/screens/Screen";
@@ -21,28 +21,28 @@ import { Screen as DressPage } from "./routes/DressPage/screens/Screen";
 import { Screen as AccessoryPage } from "./routes/AccessoryPage/screens/Screen";
 import { Screen as HomewearPage } from "./routes/HomewearPage/screens/Screen";
 import { Screen as KidsPage } from "./routes/KidsPage/screens/Screen";
-import { Screen as ProfileEditPage } from "./routes/Screen94/screens/Screen";
+import { ProfileEditPage } from "./routes/ProfileEditPage/screens/ProfileEditPage";
 import { Screen as Screen101 } from "./routes/Screen101/screens/Screen";
-import { Screen as MyReviewsPage } from "./routes/Screen108/screens/Screen";
-import { Screen as LoginPage } from "./routes/Screen113/screens/Screen";
+import { MyReviewsPage } from "./routes/MyReviewsPage/screens/MyReviewsPage";
+import { LoginPage } from "./routes/LoginPage/screens/LoginPage";
 import { Screen as Screen120 } from "./routes/Screen120/screens/Screen";
 import { Screen as Screen126 } from "./routes/Screen126/screens/Screen";
 import { Screen as Screen133 } from "./routes/Screen133/screens/Screen";
 import { Screen as Screen145 } from "./routes/Screen145/screens/Screen";
 import { Screen as AdminMyPage } from "./routes/AdminMyPage/screens/Screen";
 import { Screen as CommunityPage } from "./routes/CommunityPage/screens/Screen";
-import { DivWrapper as BoardPage } from "./routes/DivWrapper/screens/DivWrapper";
-import { Screen as PostWritePage } from "./routes/Screen162/screens/Screen";
-import { Screen as PostDetailPage } from "./routes/Screen168/screens/Screen";
+import { BoardPage } from "./routes/BoardPage/screens/BoardPage";
+import { PostWritePage } from "./routes/PostWritePage/screens/PostWritePage";
+import { PostDetailPage } from "./routes/PostDetailPage/screens/PostDetailPage";
 import { Screen as MalePage } from "./routes/MalePage/screens/Screen";
-import { Screen as FemalePage } from "./routes/FemalePage/screens/Screen";
+import { FemalePage } from "./routes/FemalePage/screens/FemalePage";
 import { ScrollContainer } from "./components/ScrollContainer";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<ScrollContainer />} />
+        <Route path="/" element={<MainScreen />} />
         <Route path="/shop" element={<ShopScreen />} />
         <Route path="/menu" element={<MenuScreen />} />
         <Route path="/screen14" element={<Screen14 />} />
@@ -79,6 +79,8 @@ function App() {
         <Route path="/board" element="<BoardPage />" />
         <Route path="/write-post" element="<PostWritePage />" />
         <Route path="/post/:id" element="<PostDetailPage />" />
+        <Route path="/order-history" element={<OrderHistory />} />
+        <Route path="/review" element={<ReviewPage />} />
       </Routes>
     </Router>
   );
