@@ -9,19 +9,62 @@ import { Separator } from "../components/ui/separator";
 export const Screen = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState("buyer"); // buyer | seller
+  const [formData, setFormData] = useState({
+    id: "",
+    password: "",
+    paymentPassword: "",
+    name: "",
+    phone: "",
+    gender: "male",
+    height: "",
+    weight: "",
+    storeName: "",
+  });
+  const [passwordConfirm, setPasswordConfirm] = useState("");
 
-  const handleSubmit = () => {
-    // 👉 역할을 로컬스토리지에 저장 (App.jsx 분기와 호환되도록 대문자로 저장)
-    const role = userType === "seller" ? "SELLER" : "BUYER";
-    localStorage.setItem("role", role);
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
 
-    // 👉 역할별 목적지로 이동
-    //  - 판매자: /admin-mypage (판매자 탭 화면)
-    //  - 구매자: /shop (일반 쇼핑 홈)
-    const dest = role === "SELLER" ? "/admin-mypage" : "/shop";
+  const handleGenderChange = (value) => {
+    setFormData((prev) => ({ ...prev, gender: value }));
+  };
 
-    alert("회원가입이 완료되었습니다!");
-    navigate(dest, { replace: true });
+  const handleSubmit = async () => {
+    if (formData.password !== passwordConfirm) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    const requestBody = {
+      ...formData,
+      type: userType.toUpperCase(),
+      secondPassword: formData.paymentPassword,
+      userName: formData.name,
+      tall: formData.height,
+    };
+
+    try {
+      const response = await fetch("/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.ok) {
+        alert("회원가입이 완료되었습니다!");
+        navigate("/login", { replace: true });
+      } else {
+        const errorData = await response.json();
+        alert(`회원가입 실패: ${errorData.message || "알 수 없는 오류"}`);
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("회원가입 중 오류가 발생했습니다.");
+    }
   };
 
   const navigationItems = [
@@ -125,7 +168,9 @@ export const Screen = () => {
               </Label>
             </div>
             <Input
-              id="username"
+              id="id"
+              value={formData.id}
+              onChange={handleChange}
               className="top-[492px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
             />
 
@@ -140,6 +185,8 @@ export const Screen = () => {
             <Input
               id="password"
               type="password"
+              value={formData.password}
+              onChange={handleChange}
               className="top-[554px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
             />
 
@@ -154,12 +201,11 @@ export const Screen = () => {
             <Input
               id="passwordConfirm"
               type="password"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
               className="top-[612px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
             />
-            <div className="top-[645px] left-[606px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[8px] leading-[11.2px] absolute text-center tracking-[0] whitespace-nowrap">
-              비밀번호가 틀렸습니다.
-            </div>
-
+            
             <div className="absolute top-[673px] left-[441px]">
               <Label
                 htmlFor="paymentPassword"
@@ -172,6 +218,8 @@ export const Screen = () => {
               <Input
                 id="paymentPassword"
                 type="password"
+                value={formData.paymentPassword}
+                onChange={handleChange}
                 placeholder="6자리 숫자로 입력해주세요"
                 className="w-full h-full border-none rounded-none [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-xs leading-[16.8px] text-center tracking-[0]"
               />
@@ -187,6 +235,8 @@ export const Screen = () => {
             </div>
             <Input
               id="name"
+              value={formData.name}
+              onChange={handleChange}
               className="top-[734px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
             />
 
@@ -202,6 +252,8 @@ export const Screen = () => {
               <Input
                 id="phone"
                 type="tel"
+                value={formData.phone}
+                onChange={handleChange}
                 placeholder="- 없이 입력하세요."
                 className="w-full h-full border-none rounded-none [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#999999] text-[10px] leading-[14px] text-center tracking-[0]"
               />
@@ -214,7 +266,8 @@ export const Screen = () => {
             </div>
             <RadioGroup
               className="absolute w-[184px] h-[22px] top-[859px] left-[606px]"
-              defaultValue="male"
+              value={formData.gender}
+              onValueChange={handleGenderChange}
             >
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center space-x-3">
@@ -258,6 +311,8 @@ export const Screen = () => {
               <Input
                 id="height"
                 type="number"
+                value={formData.height}
+                onChange={handleChange}
                 className="w-full h-full border-none rounded-none pr-8"
               />
               <div className="absolute top-1 right-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px] whitespace-nowrap">
@@ -277,6 +332,8 @@ export const Screen = () => {
               <Input
                 id="weight"
                 type="number"
+                value={formData.weight}
+                onChange={handleChange}
                 className="w-full h-full border-none rounded-none pr-8"
               />
               <div className="absolute top-1 right-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px] whitespace-nowrap">
@@ -297,6 +354,8 @@ export const Screen = () => {
 
               <Input
                 id="storeName"
+                value={formData.storeName}
+                onChange={handleChange}
                 disabled={userType !== "seller"}  // 판매자만 활성화
                 className={`w-[398px] h-8 border-[0.6px] rounded-none ${
                   userType === "seller"
@@ -311,7 +370,7 @@ export const Screen = () => {
             <Button
               variant="outline"
               className="absolute w-[242px] h-[60px] top-0 left-0 border border-solid border-[#828282] rounded-none bg-white hover:bg-gray-50 h-auto"
-              onClick={() => navigate("/mypage")}
+              onClick={() => navigate("/login")}
             >
               <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
                 취소

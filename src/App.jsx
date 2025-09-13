@@ -116,6 +116,7 @@ function AppContent() {
       />
       {/* 리뷰 페이지는 판매자도 접근 가능(디자인 확인/테스트 용) */}
       <Route path="/review" element={<ReviewPage />} />
+      <Route path="/review/:product_detail_num" element={<ReviewPage />} />
       <Route
         path="/wishlist"
         element={

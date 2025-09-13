@@ -1,8 +1,9 @@
 // src/routes/Screen120/screens/Screen.jsx
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import { useAuth } from "../../../lib/AuthContext";
 import { MenuIcon, SearchIcon } from "lucide-react";
 
 /**
@@ -13,7 +14,10 @@ import { MenuIcon, SearchIcon } from "lucide-react";
 export const Screen = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const { user } = useAuth();
+  const isSeller = user?.type === 'SELLER';
 
+  // 기본 상품 정보 (전체 재고 대신 색상/사이즈 목록만 사용)
   const product = useMemo(
     () =>
       state?.product ?? {
@@ -25,22 +29,60 @@ export const Screen = () => {
         shipping: "3,500원",
         colors: ["Black", "White", "Red"],
         sizes: ["S", "M", "L"],
-        qty: 2,
         image: "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png",
       },
     [state]
   );
 
+  // 백엔드에서 가져왔다고 가정한 상세 재고 정보 (product_detail)
+  const productDetails = useMemo(
+    () => [
+      { color: "Black", size: "S", qty: 5 },
+      { color: "Black", size: "M", qty: 3 },
+      { color: "Black", size: "L", qty: 8 },
+      { color: "White", size: "S", qty: 2 },
+      { color: "White", size: "M", qty: 0 }, // 재고 없음 케이스
+      { color: "White", size: "L", qty: 4 },
+      { color: "Red", size: "S", qty: 6 },
+      { color: "Red", size: "M", qty: 9 },
+      { color: "Red", size: "L", qty: 1 },
+    ],
+    []
+  );
+
+  // 선택된 옵션 (색상, 사이즈)
   const [color, setColor] = useState(product.colors?.[0] ?? "");
   const [size, setSize] = useState(product.sizes?.[0] ?? "");
-  const [qty, setQty] = useState(product.qty ?? 1);
 
-  const inc = () => setQty((n) => Math.min(99, n + 1));
-  const dec = () => setQty((n) => Math.max(1, n - 1));
+  // 사용자가 선택한 수량
+  const [selectedQty, setSelectedQty] = useState(1);
+
+  // 현재 선택된 조합(color, size)의 재고
+  const availableQty = useMemo(() => {
+    const detail = productDetails.find(
+      (d) => d.color === color && d.size === size
+    );
+    return detail?.qty ?? 0;
+  }, [color, size, productDetails]);
+
+  // 색상이나 사이즈가 변경될 때마다, 선택 수량을 1로 초기화하고, 재고가 있으면 1, 없으면 0으로 설정
+  useEffect(() => {
+    setSelectedQty(availableQty > 0 ? 1 : 0);
+  }, [color, size, availableQty]);
+
+  const inc = () =>
+    setSelectedQty((n) => Math.min(availableQty, n + 1));
+  const dec = () => setSelectedQty((n) => Math.max(1, n - 1));
 
   const handleEdit = () => {
+    if (availableQty === 0) {
+      alert("이 상품은 현재 재고가 없습니다.");
+      return;
+    }
     // 여기서 수정 페이지로 이동하거나 모달을 띄우는 등 원하는 액션 연결
-    alert("수정하기 눌림 (원하는 액션으로 연결하세요)");
+    alert(
+      `선택된 상품: ${color} / ${size}, 수량: ${selectedQty}개\n(원하는 액션으로 연결하세요)`
+    );
   };
 
   const topNavItems = [
@@ -184,14 +226,18 @@ export const Screen = () => {
                     variant="outline"
                     className="h-8 w-8 rounded-none"
                     onClick={dec}
+                    disabled={availableQty === 0}
                   >
                     -
                   </Button>
-                  <span className="w-6 text-center">{qty}</span>
+                  <span className="w-10 text-center">
+                    {availableQty === 0 ? "품절" : `${selectedQty}`}
+                  </span>
                   <Button
                     variant="outline"
                     className="h-8 w-8 rounded-none"
                     onClick={inc}
+                    disabled={availableQty === 0 || selectedQty >= availableQty}
                   >
                     +
                   </Button>
@@ -200,12 +246,14 @@ export const Screen = () => {
             </div>
 
             <div className="mt-8">
+            {isSeller && (
               <Button
                 className="w-[220px] h-[52px] bg-[#6c6c6c] hover:bg-[#5b5b5b] rounded-none"
                 onClick={handleEdit}
               >
                 수정하기
               </Button>
+            )}
             </div>
           </div>
 

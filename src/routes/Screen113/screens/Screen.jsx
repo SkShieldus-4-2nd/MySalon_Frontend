@@ -1,6 +1,7 @@
 import { MenuIcon, SearchIcon } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../lib/AuthContext";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -9,12 +10,14 @@ import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
 
 export const Screen = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [loginData, setLoginData] = useState({
-    username: "",
+    id: "",
     password: "",
     guestName: "",
     guestPhone: ""
   });
+  const [error, setError] = useState("");
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
@@ -30,14 +33,21 @@ export const Screen = () => {
     { value: "findPassword", label: "비밀번호 찾기", bgColor: "bg-[#d9d9d9]" },
   ];
 
-  const handleLogin = () => {
-    if (!loginData.username || !loginData.password) {
-      alert('아이디와 비밀번호를 입력해주세요.');
+  const handleLogin = async () => {
+    if (!loginData.id || !loginData.password) {
+      setError('아이디와 비밀번호를 입력해주세요.');
       return;
     }
-    // Simulate login success
-    alert('로그인 성공!');
-    navigate('/mypage');
+    setError("");
+
+    const result = await login(loginData.id, loginData.password);
+
+    if (result.success) {
+      alert('로그인 성공!');
+      navigate('/mypage');
+    } else {
+      setError(result.message || '아이디 또는 비밀번호가 틀렸습니다.');
+    }
   };
 
   const handleGuestOrder = () => {
@@ -136,8 +146,8 @@ export const Screen = () => {
                 <div className="flex-1 space-y-4">
                   <Input
                     placeholder="아이디"
-                    value={loginData.username}
-                    onChange={(e) => setLoginData(prev => ({ ...prev, username: e.target.value }))}
+                    value={loginData.id}
+                    onChange={(e) => setLoginData(prev => ({ ...prev, id: e.target.value }))}
                     className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[13px] text-center tracking-[0] leading-[18.2px]"
                   />
                   <Input
@@ -156,8 +166,8 @@ export const Screen = () => {
                 </Button>
               </div>
 
-              <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-red-500 text-[8px] text-center tracking-[0] leading-[11.2px] whitespace-nowrap">
-                {loginData.username && loginData.password && "아이디 또는 비밀번호가 틀렸습니다."}
+              <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-red-500 text-[8px] text-center tracking-[0] leading-[11.2px] whitespace-nowrap h-3">
+                {error}
               </div>
             </div>
 
