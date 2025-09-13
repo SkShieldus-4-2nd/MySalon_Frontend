@@ -7,7 +7,7 @@ import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 
 /** ================================
- *  상품 등록 폼
+ *  상품 등록 폼 (최대수량 '추가하기' 포함, JS 버전)
  *  ================================= */
 const ProductRegisterForm = () => {
   const [form, setForm] = useState({
@@ -21,6 +21,9 @@ const ProductRegisterForm = () => {
     image: null,
   });
 
+  // 최대수량을 여러 개로 관리(시연용)
+  const [maxQtyList, setMaxQtyList] = useState([]);
+
   const onChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
@@ -30,9 +33,34 @@ const ProductRegisterForm = () => {
     }
   };
 
+  // "추가하기" 버튼
+  const addMaxQty = () => {
+    const v = String(form.maxQty).trim();
+    if (!v) return;
+    const num = Number(v);
+    if (Number.isNaN(num) || num < 0) {
+      alert("최대수량은 0 이상의 숫자로 입력해주세요.");
+      return;
+    }
+    setMaxQtyList((prev) => [...prev, num]);
+    setForm((s) => ({ ...s, maxQty: "" }));
+  };
+
+  const removeQty = (index) => {
+    setMaxQtyList((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const onSubmit = (e) => {
     e.preventDefault();
-    console.log("상품등록 payload:", form);
+    // TODO: 실제 API 연동 시 FormData 사용 권장
+    // const fd = new FormData();
+    // Object.entries({ ...form, maxQtyList }).forEach(([k, v]) => {
+    //   if (k === "image" && v) fd.append(k, v);
+    //   else fd.append(k, Array.isArray(v) ? JSON.stringify(v) : String(v ?? ""));
+    // });
+    // await fetch("/api/products", { method: "POST", body: fd });
+
+    console.log("상품등록 payload:", { ...form, maxQtyList });
     alert("등록 API 연동은 추후 진행하세요!");
   };
 
@@ -93,10 +121,49 @@ const ProductRegisterForm = () => {
           <span className="w-24 text-sm text-[#444]">사이즈</span>
           <Input name="size" value={form.size} onChange={onChange} placeholder="예: S, M, L" />
         </div>
+
+        {/* 최대수량 + 추가하기 버튼 */}
         <div className="flex items-center gap-4">
           <span className="w-24 text-sm text-[#444]">최대수량</span>
-          <Input name="maxQty" value={form.maxQty} onChange={onChange} placeholder="예: 10" />
+          <div className="flex items-center gap-2 w-full max-w-[360px]">
+            <Input
+              name="maxQty"
+              value={form.maxQty}
+              onChange={onChange}
+              placeholder="예: 10"
+              inputMode="numeric"
+            />
+            <Button
+              type="button"
+              onClick={addMaxQty}
+              className="h-[32px] px-3 bg-[#8b8b8b] hover:bg-[#6f6f6f] text-white rounded-none text-[12px]"
+            >
+              추가하기
+            </Button>
+          </div>
         </div>
+
+        {/* 추가된 수량 태그 표시(옵션) */}
+        {maxQtyList.length > 0 && (
+          <div className="ml-[calc(6rem+1rem)] flex flex-wrap gap-2">
+            {maxQtyList.map((q, i) => (
+              <div
+                key={`${q}-${i}`}
+                className="flex items-center gap-2 px-2 py-1 border border-[#d1d1d1] text-[12px]"
+              >
+                {q}
+                <button
+                  type="button"
+                  onClick={() => removeQty(i)}
+                  className="text-[#888] hover:text-black"
+                  aria-label="remove"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="pt-6">
           <Button type="submit" className="w-48 h-12 bg-[#828282] hover:bg-[#6e6e6e] rounded-none">
@@ -112,7 +179,7 @@ export const Screen = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("product-list");
 
-  // ✅ 상세(판매자용) 페이지로 이동: /screen120
+  // 상세(판매자용) 페이지로 이동
   const goToDetail = (product) => {
     navigate("/screen120", { state: { product } });
   };
@@ -170,26 +237,19 @@ export const Screen = () => {
     { name: "커뮤니티", onClick: () => navigate("/") },
   ];
 
-  // 🔹 각 탭의 버튼 동작 (임시)
-  const onColorInfo = (product) => {
-    alert(`[색상정보]\n${product.colors?.join(", ") || "-"}`);
-  };
-  const onQtyInfo = (product) => {
-    alert(`[수량정보]\n등록 수량: ${product.qty ?? 0}`);
-  };
-  const onOrderInfo = (product) => {
+  // 임시 액션
+  const onColorInfo = (product) => alert(`[색상정보]\n${product.colors?.join(", ") || "-"}`);
+  const onQtyInfo = (product) => alert(`[수량정보]\n등록 수량: ${product.qty ?? 0}`);
+  const onOrderInfo = (product) =>
     alert(`[주문정보]\n주문번호 예시: ORD-${product.id}\n수량: ${product.qty ?? 1}`);
-  };
-  const onShip = (product) => {
-    alert(`[배송하기]\n${product.name} 발송 처리 (샘플)`);
-  };
+  const onShip = (product) => alert(`[배송하기]\n${product.name} 발송 처리 (샘플)`);
 
   return (
     <div className="bg-white min-h-screen w-full">
       <div className="max-w-[1440px] mx-auto bg-white">
         <header className="bg-[#d9d9d9] h-[244px] relative">
           <div className="absolute top-[33px] right-[133px]">
-            <div className="flex gap-4 font-normal text-black text-[15px] leading-[21px]">
+            <div className="flex gap-4 text-black text-[15px] leading-[21px]">
               {topNavItems.map((item, index) => (
                 <Button
                   key={index}
@@ -339,7 +399,7 @@ export const Screen = () => {
             </>
           )}
 
-          {/* 판매 목록 (이미 구현) */}
+          {/* 판매 목록 */}
           {activeTab === "sales-list" && (
             <>
               <h1 className="mb-[32px] font-bold text-black text-[27px] leading-[37.8px]">
@@ -395,7 +455,7 @@ export const Screen = () => {
             </>
           )}
 
-          {/* ✅ 주문/발송: 스샷 레이아웃 */}
+          {/* 주문/발송 */}
           {activeTab === "order-shipping" && (
             <>
               <h1 className="mb-[32px] font-bold text-black text-[27px] leading-[37.8px]">
