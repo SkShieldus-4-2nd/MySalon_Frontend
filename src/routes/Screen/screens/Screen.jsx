@@ -21,32 +21,28 @@ export const Screen = () => {
   const productItems = [
     {
       id: 1,
-      image:
-        "https://c.animaapp.com/mfdr5z0vfXP3sX/img/maneking-gwa-osgage-5.png",
+      image: "https://c.animaapp.com/mfdr5z0vfXP3sX/img/maneking-gwa-osgage-5.png",
       name: "상품 이름 (판매자가 지정하는 이름)",
       price: "50,000원",
       category: "MALE",
     },
     {
       id: 2,
-      image:
-        "https://c.animaapp.com/mfdr5z0vfXP3sX/img/maneking-gwa-osgage-6.png",
+      image: "https://c.animaapp.com/mfdr5z0vfXP3sX/img/maneking-gwa-osgage-6.png",
       name: "상품 이름 (판매자가 지정하는 이름)",
       price: "50,000원",
       category: "MALE",
     },
     {
       id: 3,
-      image:
-        "https://c.animaapp.com/mfdr5z0vfXP3sX/img/maneking-gwa-osgage-7.png",
+      image: "https://c.animaapp.com/mfdr5z0vfXP3sX/img/maneking-gwa-osgage-7.png",
       name: "상품 이름 (판매자가 지정하는 이름)",
       price: "50,000원",
       category: "MALE",
     },
     {
       id: 4,
-      image:
-        "https://c.animaapp.com/mfdr5z0vfXP3sX/img/maneking-gwa-osgage-8.png",
+      image: "https://c.animaapp.com/mfdr5z0vfXP3sX/img/maneking-gwa-osgage-8.png",
       name: "상품 이름 (판매자가 지정하는 이름)",
       price: "50,000원",
       category: "MALE",
@@ -61,16 +57,16 @@ export const Screen = () => {
         {/* Search Bar */}
         <div className="flex justify-center my-8">
           <div className="relative w-[400px]">
-            <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#999999]" />
+            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#999999]" />
             <Input
               placeholder="Search"
               className="w-full h-[50px] pl-12 pr-12 bg-[#78788029] border-none rounded-full text-[17px] [font-family:'SF_Pro-Regular',Helvetica] placeholder:text-[#999999]"
             />
-            <MicIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#999999]" />
+            <MicIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#999999]" />
           </div>
         </div>
 
-        {/* Shop By My Salon Section */}
+        {/* Shop By My Salon */}
         <section className="text-center">
           <h2 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl tracking-[-0.08px] leading-[22px] mb-[77px]">
             SHOP BY MY SALON
@@ -78,7 +74,11 @@ export const Screen = () => {
 
           <div className="flex justify-center items-center gap-[73px] mb-[91px]">
             {categoryItems.map((category, index) => (
-              <div key={index} className="text-center cursor-pointer" onClick={() => navigate(category.path)}>
+              <div
+                key={index}
+                className="text-center cursor-pointer"
+                onClick={() => navigate(category.path)}
+              >
                 <div className="w-[78px] h-[71px] bg-[#bdbdbd] rounded-full mb-4 mx-auto" />
                 <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl tracking-[-0.08px] leading-[22px]">
                   {category.name}
@@ -88,24 +88,25 @@ export const Screen = () => {
           </div>
         </section>
 
-        {/* Recommended Products Section */}
+        {/* Recommended Products */}
         <section className="text-center mb-[103px]">
           <h2 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl tracking-[-0.08px] leading-[22px] mb-[67px]">
             당신을 위한 추천상품
           </h2>
 
-          <div className="grid grid-cols-4 gap-[91px] max-w-[1201px] mx-auto px-[134px]">
-            {productItems.map((product, index) => (
+          {/* z-index 올려서 헤더와의 충돌 방지 */}
+          <div className="grid grid-cols-4 gap-[91px] max-w-[1201px] mx-auto px-[134px] relative z-20">
+            {productItems.map((product) => (
               <Card
-                key={index}
+                key={product.id}
                 className="bg-transparent border-none shadow-none cursor-pointer"
-                onClick={() => navigate(`/post/${product.id}`)}
+                onClick={() => navigate("/screen126", { state: { product } })}
               >
                 <CardContent className="p-0">
                   <div className="relative mb-6">
                     <img
                       className="w-[232px] h-[348px] relative z-10"
-                      alt="Maneking gwa osgage"
+                      alt={product.name}
                       src={product.image}
                     />
                   </div>

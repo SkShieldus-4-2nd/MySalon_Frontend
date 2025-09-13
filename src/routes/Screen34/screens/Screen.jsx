@@ -7,13 +7,7 @@ import { Input } from "../components/ui/input";
 
 export const Screen = () => {
   const navigate = useNavigate();
-  const navigationItems = [
-    "로그인",
-    "회원가입",
-    "장바구니",
-    "마이페이지",
-    "커뮤니티",
-  ];
+  const navigationItems = ["로그인", "회원가입", "장바구니", "마이페이지", "커뮤니티"];
 
   const categoryItems = [
     { name: "상의" },
@@ -23,31 +17,32 @@ export const Screen = () => {
     { name: "키즈" },
   ];
 
+  // ✅ id 추가
   const productItems = [
     {
-      image:
-        "https://c.animaapp.com/mfenltbwLLE3QT/img/maneking-gwa-osgage-1.png",
+      id: 1,
+      image: "https://c.animaapp.com/mfenltbwLLE3QT/img/maneking-gwa-osgage-1.png",
       name: "상품 이름 (판매자가 지정하는 이름)",
       category: "MALE",
       price: "50,000원",
     },
     {
-      image:
-        "https://c.animaapp.com/mfenltbwLLE3QT/img/maneking-gwa-osgage-2.png",
+      id: 2,
+      image: "https://c.animaapp.com/mfenltbwLLE3QT/img/maneking-gwa-osgage-2.png",
       name: "상품 이름 (판매자가 지정하는 이름)",
       category: "MALE",
       price: "50,000원",
     },
     {
-      image:
-        "https://c.animaapp.com/mfenltbwLLE3QT/img/maneking-gwa-osgage-3.png",
+      id: 3,
+      image: "https://c.animaapp.com/mfenltbwLLE3QT/img/maneking-gwa-osgage-3.png",
       name: "상품 이름 (판매자가 지정하는 이름)",
       category: "MALE",
       price: "50,000원",
     },
     {
-      image:
-        "https://c.animaapp.com/mfenltbwLLE3QT/img/maneking-gwa-osgage-4.png",
+      id: 4,
+      image: "https://c.animaapp.com/mfenltbwLLE3QT/img/maneking-gwa-osgage-4.png",
       name: "상품 이름 (판매자가 지정하는 이름)",
       category: "MALE",
       price: "50,000원",
@@ -65,24 +60,18 @@ export const Screen = () => {
           />
 
           <nav>
-            <div className="flex gap-4 [font-family:'Crimson_Text',Helvetica] font-normal text-black text-[15px] tracking-[0] leading-[21px]">
+            <div className="flex gap-4 [font-family:'Crimson_Text',Helvetica] font-normal text-black text-[15px] leading-[21px]">
               {navigationItems.map((item, index) => (
                 <Button
                   key={index}
                   variant="ghost"
                   className="h-auto p-0 text-[15px] font-normal"
                   onClick={() => {
-                    if (item === "로그인") {
-                      navigate('/login');
-                    } else if (item === "회원가입") {
-                      navigate('/signup');
-                    } else if (item === "마이페이지") {
-                      navigate('/mypage');
-                    } else if (item === "장바구니") {
-                      navigate('/cart');
-                    } else if (item === "커뮤니티") {
-                      navigate('/community');
-                    }
+                    if (item === "로그인") navigate("/login");
+                    else if (item === "회원가입") navigate("/signup");
+                    else if (item === "마이페이지") navigate("/mypage");
+                    else if (item === "장바구니") navigate("/cart");
+                    else if (item === "커뮤니티") navigate("/community");
                   }}
                 >
                   {item}
@@ -94,10 +83,10 @@ export const Screen = () => {
 
         <main className="flex flex-col items-center px-6">
           <section className="text-center mb-12 mt-8">
-            <div className="[font-family:'SF_Pro-Regular',Helvetica] text-black text-[13px] text-center tracking-[0] leading-[18.2px] font-normal mb-2">
+            <div className="[font-family:'SF_Pro-Regular',Helvetica] text-black text-[13px] leading-[18.2px] mb-2">
               당신만을 위한 옷장
             </div>
-            <h1 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[35px] text-center tracking-[0] leading-[49px] mb-4">
+            <h1 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[35px] leading-[49px] mb-4">
               MY SALON
             </h1>
             <img
@@ -123,7 +112,7 @@ export const Screen = () => {
           </section>
 
           <section className="w-full mb-12">
-            <h2 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl tracking-[-0.08px] leading-[22px] text-center mb-8">
+            <h2 className="[font-family:'SF_Pro-Regular',Helvetica] text-black text-xl leading-[22px] text-center mb-8">
               SHOP BY MY SALON
             </h2>
 
@@ -141,7 +130,7 @@ export const Screen = () => {
               {categoryItems.map((category, index) => (
                 <div
                   key={index}
-                  className="[font-family:'SF_Pro-Regular',Helvetica] text-black text-xl tracking-[-0.08px] leading-[22px] font-normal text-center w-[78px]"
+                  className="[font-family:'SF_Pro-Regular',Helvetica] text-black text-xl leading-[22px] text-center w-[78px]"
                 >
                   {category.name}
                 </div>
@@ -150,33 +139,40 @@ export const Screen = () => {
           </section>
 
           <section className="w-full mb-12">
-            <h2 className="[font-family:'SF_Pro-Regular',Helvetica] text-black text-xl tracking-[-0.08px] leading-[22px] font-normal text-center mb-8">
+            <h2 className="[font-family:'SF_Pro-Regular',Helvetica] text-black text-xl leading-[22px] text-center mb-8">
               당신을 위한 추천상품
             </h2>
 
             <div className="grid grid-cols-4 gap-8 mb-8">
-              {productItems.map((product, index) => (
-                <Card key={index} className="bg-white border-0 shadow-none">
+              {productItems.map((product) => (
+                <Card
+                  key={product.id}
+                  className="bg-white border-0 shadow-none cursor-pointer"
+                  // ✅ 상세로 이동 & 데이터 전달
+                  onClick={() =>
+                    navigate("/screen126", { state: { productId: product.id, product } })
+                  }
+                >
                   <CardContent className="p-0">
                     <div className="relative w-[232px] h-[348px] mb-4">
                       <div className="absolute w-[231px] h-[273px] top-[38px] left-0 bg-white" />
                       <img
                         className="absolute w-[232px] h-[348px] top-0 left-0"
-                        alt="Maneking gwa osgage"
+                        alt={product.name}
                         src={product.image}
                       />
                     </div>
 
                     <div className="w-[220px] h-[50px]">
                       <div className="w-[214px] h-[29px] mb-1">
-                        <div className="[font-family:'Crimson_Text',Helvetica] font-normal text-[#828282] text-[8px] tracking-[0] leading-[11.2px] mb-1">
+                        <div className="[font-family:'Crimson_Text',Helvetica] font-normal text-[#828282] text-[8px] leading-[11.2px] mb-1">
                           {product.category}
                         </div>
-                        <div className="[font-family:'Galdeano',Helvetica] text-black text-[15px] tracking-[0] leading-[21px] font-normal">
+                        <div className="[font-family:'Galdeano',Helvetica] text-black text-[15px] leading-[21px] font-normal">
                           {product.name}
                         </div>
                       </div>
-                      <div className="[font-family:'DM_Serif_Text',Helvetica] font-normal text-black text-[15px] tracking-[0] leading-[21px]">
+                      <div className="[font-family:'DM_Serif_Text',Helvetica] font-normal text-black text-[15px] leading-[21px]">
                         {product.price}
                       </div>
                     </div>
@@ -190,7 +186,7 @@ export const Screen = () => {
                 className="w-[88px] h-7 bg-[url(https://c.animaapp.com/mfenltbwLLE3QT/img/rectangle-23.svg)] bg-[100%_100%] border-0 hover:opacity-80 h-auto"
                 variant="ghost"
               >
-                <span className="[font-family:'DM_Serif_Text',Helvetica] text-white text-[15px] tracking-[0] leading-[21px] font-normal">
+                <span className="[font-family:'DM_Serif_Text',Helvetica] text-white text-[15px] leading-[21px] font-normal">
                   더보기
                 </span>
               </Button>
@@ -199,7 +195,7 @@ export const Screen = () => {
         </main>
 
         <footer className="text-center px-6 py-12">
-          <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px]">
+          <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] leading-[21px]">
             My Salon
             <br />
             상호명: SK쉴더스 주식회사 | 대표이사: 5조 <br />

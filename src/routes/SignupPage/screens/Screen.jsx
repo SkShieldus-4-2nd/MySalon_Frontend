@@ -8,20 +8,28 @@ import { Separator } from "../components/ui/separator";
 
 export const Screen = () => {
   const navigate = useNavigate();
-  const [userType, setUserType] = useState("buyer");
+  const [userType, setUserType] = useState("buyer"); // buyer | seller
 
   const handleSubmit = () => {
-    // Handle signup logic here
+    // 👉 역할을 로컬스토리지에 저장 (App.jsx 분기와 호환되도록 대문자로 저장)
+    const role = userType === "seller" ? "SELLER" : "BUYER";
+    localStorage.setItem("role", role);
+
+    // 👉 역할별 목적지로 이동
+    //  - 판매자: /admin-mypage (판매자 탭 화면)
+    //  - 구매자: /shop (일반 쇼핑 홈)
+    const dest = role === "SELLER" ? "/admin-mypage" : "/shop";
+
     alert("회원가입이 완료되었습니다!");
-    navigate("/");
+    navigate(dest, { replace: true });
   };
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate("/login") },
     { name: "회원가입", onClick: () => navigate("/signup") },
-    { name: "장바구니", onClick: () => navigate("/") },
-    { name: "마이페이지", onClick: () => navigate("/") },
-    { name: "커뮤니티", onClick: () => navigate("/") },
+    { name: "장바구니", onClick: () => navigate("/cart") },
+    { name: "마이페이지", onClick: () => navigate("/mypage") },
+    { name: "커뮤니티", onClick: () => navigate("/community") },
   ];
 
   return (

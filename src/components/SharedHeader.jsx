@@ -14,13 +14,7 @@ export const SharedHeader = ({ className }) => {
   const [showNavigation, setShowNavigation] = useState(false);
   const [activeNav, setActiveNav] = useState("상의");
 
-  const topNavItems = [
-    "로그인",
-    "회원가입",
-    "장바구니",
-    "마이페이지",
-    "커뮤니티",
-  ];
+  const topNavItems = ["로그인", "회원가입", "장바구니", "마이페이지", "커뮤니티"];
 
   const mainNavItems = [
     { name: "상의", path: "/category/상의" },
@@ -35,19 +29,20 @@ export const SharedHeader = ({ className }) => {
 
   return (
     <>
-      <header 
-        className={`transition-all duration-300 ease-in-out relative overflow-hidden ${
+      {/* 헤더 전체: 클릭 막기 + z-index 낮게 */}
+      <header
+        className={`pointer-events-none z-10 transition-all duration-300 ease-in-out relative overflow-hidden ${
           showNavigation ? "h-[370px] bg-[#e3e2e2]" : "h-0"
         } ${className}`}
       >
         <img
-          className="w-full h-[271px] object-cover absolute top-0 left-0"
+          className="w-full h-[271px] object-cover absolute top-0 left-0 pointer-events-none"
           alt="Rectangle"
           src="https://c.animaapp.com/mfdr5z0vfXP3sX/img/rectangle-33.svg"
         />
 
         {/* Top Navigation */}
-        <nav className="absolute top-[33px] right-[80px]">
+        <nav className="absolute top-[33px] right-[80px] pointer-events-auto">
           <div className="flex items-center gap-4 [font-family:'Crimson_Text',Helvetica] font-normal text-black text-[15px]">
             {topNavItems.map((item, index) => (
               <Button
@@ -55,17 +50,11 @@ export const SharedHeader = ({ className }) => {
                 variant="ghost"
                 className="h-auto p-0 text-[15px] font-normal"
                 onClick={() => {
-                  if (item === "로그인") {
-                    navigate('/login');
-                  } else if (item === "회원가입") {
-                    navigate('/signup');
-                  } else if (item === "마이페이지") {
-                    navigate('/mypage');
-                  } else if (item === "장바구니") {
-                    navigate('/cart');
-                  } else if (item === "커뮤니티") {
-                    navigate('/community');
-                  }
+                  if (item === "로그인") navigate("/login");
+                  else if (item === "회원가입") navigate("/signup");
+                  else if (item === "마이페이지") navigate("/mypage");
+                  else if (item === "장바구니") navigate("/cart");
+                  else if (item === "커뮤니티") navigate("/community");
                 }}
               >
                 {item}
@@ -75,7 +64,7 @@ export const SharedHeader = ({ className }) => {
         </nav>
 
         {/* Logo Section */}
-        <div className="absolute top-[75px] left-1/2 transform -translate-x-1/2 text-center">
+        <div className="absolute top-[75px] left-1/2 -translate-x-1/2 text-center pointer-events-none">
           <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[11.1px] mb-3">
             당신만을 위한 옷장
           </div>
@@ -90,7 +79,7 @@ export const SharedHeader = ({ className }) => {
         </div>
 
         {/* Main Navigation */}
-        <NavigationMenu className="absolute top-[215px] left-1/2 transform -translate-x-1/2">
+        <NavigationMenu className="absolute top-[215px] left-1/2 -translate-x-1/2 pointer-events-auto">
           <NavigationMenuList className="flex items-center gap-8">
             {mainNavItems.map((item, index) => (
               <NavigationMenuItem key={index}>
@@ -111,11 +100,11 @@ export const SharedHeader = ({ className }) => {
         </NavigationMenu>
       </header>
 
-      {/* Hamburger MenuIcon */}
+      {/* 햄버거 버튼만 최상단 + 클릭 가능 */}
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-[15px] left-[25px] w-[58px] h-[58px] bg-neutral-100 rounded-full hover:bg-neutral-200 z-30"
+        className="pointer-events-auto absolute top-[15px] left-[25px] w-[58px] h-[58px] bg-neutral-100 rounded-full hover:bg-neutral-200 z-30"
         onMouseEnter={() => setShowNavigation(true)}
         onClick={() => setShowNavigation(!showNavigation)}
       >

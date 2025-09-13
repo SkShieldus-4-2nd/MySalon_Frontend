@@ -1,3 +1,4 @@
+// src/routes/AdminMyPage/screens/Screen.jsx
 import { MenuIcon, SearchIcon } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +9,11 @@ import { Input } from "../components/ui/input";
 export const Screen = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("product-list");
+
+  // ✅ 상세(판매자용) 페이지로 이동: /screen120
+  const goToDetail = (product) => {
+    navigate("/screen120", { state: { product } });
+  };
 
   const navigationItems = [
     { id: "product-list", label: "상품 목록", active: true },
@@ -25,31 +31,41 @@ export const Screen = () => {
         "여름에 입기 좋은 롱 원피스.. 상품 설명 상품 설명 상품 설명\n상품 설명상품 설명상품 설명상품 설명상품 설명상품 설명",
       price: "50,000 원",
       image: "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png",
+      shipping: "3,000원",
+      colors: ["Black", "White", "Red"],
+      sizes: ["S", "M", "L"],
+      qty: 2,
     },
     {
-      id: "123456789",
-      name: "여름블루 롱 원피스",
-      description:
-        "여름에 입기 좋은 롱 원피스.. 상품 설명 상품 설명 상품 설명\n상품 설명상품 설명상품 설명상품 설명상품 설명상품 설명",
-      price: "50,000 원",
+      id: "987654321",
+      name: "썸머 스트라이프 드레스",
+      description: "시원한 스트라이프 패턴의 여름 원피스. 상품 설명 상품 설명 상품 설명",
+      price: "59,000 원",
       image: "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png",
+      shipping: "3,000원",
+      colors: ["Black", "White"],
+      sizes: ["S", "M"],
+      qty: 1,
     },
     {
-      id: "123456789",
-      name: "여름블루 롱 원피스",
-      description:
-        "여름에 입기 좋은 롱 원피스.. 상품 설명 상품 설명 상품 설명\n상품 설명상품 설명상품 설명상품 설명상품 설명상품 설명",
-      price: "50,000 원",
+      id: "555222333",
+      name: "플로럴 롱 원피스",
+      description: "잔잔한 플로럴 패턴이 포인트. 상품 설명 상품 설명 상품 설명",
+      price: "62,000 원",
       image: "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png",
+      shipping: "3,500원",
+      colors: ["Blue", "White"],
+      sizes: ["M", "L"],
+      qty: 3,
     },
   ];
 
   const topNavItems = [
-    { name: "로그인", onClick: () => navigate('/login') },
-    { name: "회원가입", onClick: () => navigate('/signup') },
-    { name: "장바구니", onClick: () => navigate('/cart') },
-    { name: "마이페이지", onClick: () => navigate('/admin-mypage') },
-    { name: "커뮤니티", onClick: () => navigate('/') },
+    { name: "로그인", onClick: () => navigate("/login") },
+    { name: "회원가입", onClick: () => navigate("/signup") },
+    { name: "장바구니", onClick: () => navigate("/cart") },
+    { name: "마이페이지", onClick: () => navigate("/admin-mypage") },
+    { name: "커뮤니티", onClick: () => navigate("/") },
   ];
 
   return (
@@ -76,11 +92,9 @@ export const Screen = () => {
               <div className="absolute top-3 left-0 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[29.9px] text-center tracking-[0] leading-[41.8px] whitespace-nowrap">
                 MY SALON
               </div>
-
               <div className="absolute top-0 left-7 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[11.1px] text-center tracking-[0] leading-[15.5px] whitespace-nowrap">
                 당신만을 위한 옷장
               </div>
-
               <img
                 className="absolute w-[67px] h-[66px] top-[51px] left-[38px]"
                 alt="Main icon"
@@ -92,7 +106,7 @@ export const Screen = () => {
           <Button
             variant="ghost"
             className="absolute top-[15px] left-[25px] w-[58px] h-[58px] bg-neutral-100 rounded-[29px] p-0 hover:bg-neutral-200"
-            onClick={() => navigate('/menu')}
+            onClick={() => navigate("/menu")}
           >
             <MenuIcon className="w-6 h-6" />
           </Button>
@@ -139,14 +153,16 @@ export const Screen = () => {
               </h1>
 
               <div className="space-y-[41px]">
-                {products.map((product, index) => (
-                  <Card key={index} className="border-0 shadow-none">
+                {products.map((product) => (
+                  <Card key={product.id} className="border-0 shadow-none">
                     <CardContent className="p-0">
                       <div className="flex items-start gap-[62px]">
+                        {/* 이미지 클릭 시 상세로 */}
                         <img
-                          className="w-[119px] h-[159px] object-cover flex-shrink-0"
+                          className="w-[119px] h-[159px] object-cover flex-shrink-0 cursor-pointer"
                           alt="Product image"
                           src={product.image}
+                          onClick={() => goToDetail(product)}
                         />
 
                         <div className="flex-1">
@@ -154,7 +170,11 @@ export const Screen = () => {
                             {product.id}
                           </div>
 
-                          <h3 className="mb-[10px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl text-center tracking-[0] leading-7">
+                          {/* 이름 클릭 시 상세로 */}
+                          <h3
+                            className="mb-[10px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl text-center tracking-[0] leading-7 cursor-pointer hover:underline"
+                            onClick={() => goToDetail(product)}
+                          >
                             {product.name}
                           </h3>
 
@@ -168,9 +188,11 @@ export const Screen = () => {
                         </div>
 
                         <div className="flex flex-col gap-[16px] mt-[35px]">
+                          {/* 버튼 클릭 시 상세로 */}
                           <Button
                             variant="outline"
                             className="w-[105px] h-9 border-[0.91px] border-black bg-transparent hover:bg-gray-50 rounded-none"
+                            onClick={() => goToDetail(product)}
                           >
                             <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15.4px] tracking-[0] leading-[21.6px]">
                               상품페이지
