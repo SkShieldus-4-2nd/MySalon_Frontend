@@ -6,6 +6,108 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 
+/** ================================
+ *  상품 등록 폼
+ *  ================================= */
+const ProductRegisterForm = () => {
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    price: "",
+    shippingFee: "",
+    color: "",
+    size: "",
+    maxQty: "",
+    image: null,
+  });
+
+  const onChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setForm((s) => ({ ...s, image: files?.[0] ?? null }));
+    } else {
+      setForm((s) => ({ ...s, [name]: value }));
+    }
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    console.log("상품등록 payload:", form);
+    alert("등록 API 연동은 추후 진행하세요!");
+  };
+
+  return (
+    <form onSubmit={onSubmit} className="grid grid-cols-12 gap-12">
+      {/* 좌측: 사진첨부 영역 */}
+      <div className="col-span-4">
+        <div className="w-full aspect-[3/4] border border-[#d9d9d9] flex items-center justify-center text-[#555]">
+          {form.image ? (
+            <img
+              src={URL.createObjectURL(form.image)}
+              alt="preview"
+              className="h-full object-cover"
+            />
+          ) : (
+            <label className="cursor-pointer">
+              <span>사진첨부</span>
+              <input
+                type="file"
+                accept="image/*"
+                name="image"
+                onChange={onChange}
+                className="hidden"
+              />
+            </label>
+          )}
+        </div>
+      </div>
+
+      {/* 우측: 입력 필드들 */}
+      <div className="col-span-8 space-y-4">
+        <div className="flex items-center gap-4">
+          <span className="w-24 text-sm text-[#444]">상품이름</span>
+          <Input name="name" value={form.name} onChange={onChange} />
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="w-24 text-sm text-[#444]">상품설명</span>
+          <Input name="description" value={form.description} onChange={onChange} />
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="w-24 text-sm text-[#444]">가격</span>
+          <Input name="price" value={form.price} onChange={onChange} placeholder="예: 50000" />
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="w-24 text-sm text-[#444]">배송비</span>
+          <Input
+            name="shippingFee"
+            value={form.shippingFee}
+            onChange={onChange}
+            placeholder="예: 3000"
+          />
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="w-24 text-sm text-[#444]">색상</span>
+          <Input name="color" value={form.color} onChange={onChange} placeholder="예: Black, White" />
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="w-24 text-sm text-[#444]">사이즈</span>
+          <Input name="size" value={form.size} onChange={onChange} placeholder="예: S, M, L" />
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="w-24 text-sm text-[#444]">최대수량</span>
+          <Input name="maxQty" value={form.maxQty} onChange={onChange} placeholder="예: 10" />
+        </div>
+
+        <div className="pt-6">
+          <Button type="submit" className="w-48 h-12 bg-[#828282] hover:bg-[#6e6e6e] rounded-none">
+            등록하기
+          </Button>
+        </div>
+      </div>
+    </form>
+  );
+};
+
 export const Screen = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("product-list");
@@ -28,7 +130,7 @@ export const Screen = () => {
       id: "123456789",
       name: "여름블루 롱 원피스",
       description:
-        "여름에 입기 좋은 롱 원피스.. 상품 설명 상품 설명 상품 설명\n상품 설명상품 설명상품 설명상품 설명상품 설명상품 설명",
+        "여름에 입기 좋은 롱 원피스.. 상품 설명 상품 설명 상품 설명 상품 설명 상품 설명 상품 설명",
       price: "50,000 원",
       image: "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png",
       shipping: "3,000원",
@@ -68,12 +170,26 @@ export const Screen = () => {
     { name: "커뮤니티", onClick: () => navigate("/") },
   ];
 
+  // 🔹 각 탭의 버튼 동작 (임시)
+  const onColorInfo = (product) => {
+    alert(`[색상정보]\n${product.colors?.join(", ") || "-"}`);
+  };
+  const onQtyInfo = (product) => {
+    alert(`[수량정보]\n등록 수량: ${product.qty ?? 0}`);
+  };
+  const onOrderInfo = (product) => {
+    alert(`[주문정보]\n주문번호 예시: ORD-${product.id}\n수량: ${product.qty ?? 1}`);
+  };
+  const onShip = (product) => {
+    alert(`[배송하기]\n${product.name} 발송 처리 (샘플)`);
+  };
+
   return (
     <div className="bg-white min-h-screen w-full">
       <div className="max-w-[1440px] mx-auto bg-white">
         <header className="bg-[#d9d9d9] h-[244px] relative">
           <div className="absolute top-[33px] right-[133px]">
-            <div className="flex gap-4 [font-family:'Crimson_Text',Helvetica] font-normal text-black text-[15px] tracking-[0] leading-[21px]">
+            <div className="flex gap-4 font-normal text-black text-[15px] leading-[21px]">
               {topNavItems.map((item, index) => (
                 <Button
                   key={index}
@@ -87,12 +203,12 @@ export const Screen = () => {
             </div>
           </div>
 
-          <div className="absolute top-[75px] left-1/2 transform -translate-x-1/2 w-[148px] h-[117px]">
+          <div className="absolute top-[75px] left-1/2 -translate-x-1/2 w-[148px] h-[117px]">
             <div className="relative w-36 h-[117px]">
-              <div className="absolute top-3 left-0 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[29.9px] text-center tracking-[0] leading-[41.8px] whitespace-nowrap">
+              <div className="absolute top-3 left-0 text-black text-[29.9px] text-center leading-[41.8px]">
                 MY SALON
               </div>
-              <div className="absolute top-0 left-7 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[11.1px] text-center tracking-[0] leading-[15.5px] whitespace-nowrap">
+              <div className="absolute top-0 left-7 text-black text-[11.1px] text-center leading-[15.5px]">
                 당신만을 위한 옷장
               </div>
               <img
@@ -118,7 +234,7 @@ export const Screen = () => {
                   <SearchIcon className="w-4 h-4 text-[#999999]" />
                   <Input
                     placeholder="Search"
-                    className="border-0 bg-transparent text-[#999999] text-[17px] tracking-[-0.08px] leading-[22px] placeholder:text-[#999999] focus-visible:ring-0"
+                    className="border-0 bg-transparent text-[#999999] text-[17px] leading-[22px] placeholder:text-[#999999] focus-visible:ring-0"
                   />
                 </div>
               </div>
@@ -133,10 +249,10 @@ export const Screen = () => {
                 key={item.id}
                 variant="ghost"
                 onClick={() => setActiveTab(item.id)}
-                className={`h-auto p-0 text-2xl tracking-[-0.08px] leading-[20.7px] transition-all ${
+                className={`h-auto p-0 text-2xl leading-[20.7px] transition-all ${
                   activeTab === item.id
-                    ? "[font-family:'SF_Pro-Bold',Helvetica] font-bold text-[#a40303]"
-                    : "[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black hover:text-[#a40303]"
+                    ? "font-bold text-[#a40303]"
+                    : "font-normal text-black hover:text-[#a40303]"
                 }`}
               >
                 {item.label}
@@ -146,9 +262,10 @@ export const Screen = () => {
         </nav>
 
         <main className="px-[226px]">
+          {/* 상품 목록 */}
           {activeTab === "product-list" && (
             <>
-              <h1 className="mb-[78px] [font-family:'SF_Pro-Bold',Helvetica] font-bold text-black text-[27px] tracking-[0] leading-[37.8px]">
+              <h1 className="mb-[78px] font-bold text-black text-[27px] leading-[37.8px]">
                 상품 목록
               </h1>
 
@@ -166,41 +283,40 @@ export const Screen = () => {
                         />
 
                         <div className="flex-1">
-                          <div className="mb-[7px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-xs tracking-[0] leading-[16.8px]">
+                          <div className="mb-[7px] text-[#828282] text-xs leading-[16.8px]">
                             {product.id}
                           </div>
 
                           {/* 이름 클릭 시 상세로 */}
                           <h3
-                            className="mb-[10px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl text-center tracking-[0] leading-7 cursor-pointer hover:underline"
+                            className="mb-[10px] text-black text-xl text-center leading-7 cursor-pointer hover:underline"
                             onClick={() => goToDetail(product)}
                           >
                             {product.name}
                           </h3>
 
-                          <p className="mb-[21px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[17px] tracking-[0] leading-[23.8px] whitespace-pre-line">
+                          <p className="mb-[21px] text-black text-[17px] leading-[23.8px] whitespace-pre-line">
                             {product.description}
                           </p>
 
-                          <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[23px] text-center tracking-[0] leading-[32.2px]">
+                          <div className="text-black text-[23px] text-center leading-[32.2px]">
                             {product.price}
                           </div>
                         </div>
 
                         <div className="flex flex-col gap-[16px] mt-[35px]">
-                          {/* 버튼 클릭 시 상세로 */}
                           <Button
                             variant="outline"
                             className="w-[105px] h-9 border-[0.91px] border-black bg-transparent hover:bg-gray-50 rounded-none"
                             onClick={() => goToDetail(product)}
                           >
-                            <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15.4px] tracking-[0] leading-[21.6px]">
+                            <span className="text-black text-[15.4px] leading-[21.6px]">
                               상품페이지
                             </span>
                           </Button>
 
                           <Button className="w-[105px] h-9 bg-[#828282] hover:bg-[#707070] rounded-none">
-                            <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-white text-[15.4px] tracking-[0] leading-[21.6px]">
+                            <span className="text-white text-[15.4px] leading-[21.6px]">
                               삭제
                             </span>
                           </Button>
@@ -213,47 +329,138 @@ export const Screen = () => {
             </>
           )}
 
+          {/* 상품 등록 */}
           {activeTab === "product-register" && (
-            <div className="text-center py-16">
-              <h1 className="mb-8 [font-family:'SF_Pro-Bold',Helvetica] font-bold text-black text-[27px] tracking-[0] leading-[37.8px]">
+            <>
+              <h1 className="mb-8 font-bold text-black text-[27px] leading-[37.8px]">
                 상품 등록
               </h1>
-              <p className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-lg">
-                상품 등록 페이지입니다.
-              </p>
-            </div>
+              <ProductRegisterForm />
+            </>
           )}
 
+          {/* 판매 목록 (이미 구현) */}
           {activeTab === "sales-list" && (
-            <div className="text-center py-16">
-              <h1 className="mb-8 [font-family:'SF_Pro-Bold',Helvetica] font-bold text-black text-[27px] tracking-[0] leading-[37.8px]">
-                판매 목록
+            <>
+              <h1 className="mb-[32px] font-bold text-black text-[27px] leading-[37.8px]">
+                판매목록
               </h1>
-              <p className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-lg">
-                판매 목록 페이지입니다.
-              </p>
-            </div>
+
+              <div className="space-y-[36px]">
+                {products.map((product) => (
+                  <Card key={`sales-${product.id}`} className="border-0 shadow-none">
+                    <CardContent className="p-0">
+                      <div className="flex items-start gap-[40px]">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-[119px] h-[159px] object-cover"
+                        />
+
+                        <div className="flex-1">
+                          <div className="text-[#828282] text-[12px] leading-[16px] mb-[8px]">
+                            {product.id}
+                          </div>
+                          <div className="text-[15px] leading-[21px] text-black mb-[6px]">
+                            <span className="font-medium">{product.name}</span>
+                          </div>
+                          <p className="text-[14px] leading-[20px] text-[#333] max-w-[480px] line-clamp-2">
+                            {product.description}
+                          </p>
+                          <div className="mt-[10px] text-[16px] font-semibold text-black">
+                            {product.price}
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-3 mt-[8px]">
+                          <Button
+                            variant="outline"
+                            className="w-[90px] h-[26px] border border-[#8b8b8b] rounded-none bg-white hover:bg-gray-50 text-[12px]"
+                            onClick={() => onColorInfo(product)}
+                          >
+                            색상정보
+                          </Button>
+                          <Button
+                            className="w-[90px] h-[26px] bg-[#8b8b8b] hover:bg-[#6f6f6f] rounded-none text-white text-[12px]"
+                            onClick={() => onQtyInfo(product)}
+                          >
+                            수량정보
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </>
           )}
 
+          {/* ✅ 주문/발송: 스샷 레이아웃 */}
           {activeTab === "order-shipping" && (
-            <div className="text-center py-16">
-              <h1 className="mb-8 [font-family:'SF_Pro-Bold',Helvetica] font-bold text-black text-[27px] tracking-[0] leading-[37.8px]">
+            <>
+              <h1 className="mb-[32px] font-bold text-black text-[27px] leading-[37.8px]">
                 주문/발송
               </h1>
-              <p className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-lg">
-                주문/발송 관리 페이지입니다.
-              </p>
-            </div>
+
+              <div className="space-y-[36px]">
+                {products.map((product) => (
+                  <Card key={`order-${product.id}`} className="border-0 shadow-none">
+                    <CardContent className="p-0">
+                      <div className="flex items-start gap-[40px]">
+                        {/* 썸네일 */}
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-[119px] h-[159px] object-cover"
+                        />
+
+                        {/* 중앙 텍스트 */}
+                        <div className="flex-1">
+                          <div className="text-[#828282] text-[12px] leading-[16px] mb-[8px]">
+                            {product.id}
+                          </div>
+                          <div className="text-[15px] leading-[21px] text-black mb-[6px]">
+                            <span className="font-medium">{product.name}</span>
+                          </div>
+                          <p className="text-[14px] leading-[20px] text-[#333] max-w-[480px] line-clamp-2">
+                            {product.description}
+                          </p>
+                          <div className="mt-[10px] text-[16px] font-semibold text-black">
+                            {product.price}
+                          </div>
+                        </div>
+
+                        {/* 우측 버튼: 주문정보 / 배송하기 */}
+                        <div className="flex flex-col gap-3 mt-[8px]">
+                          <Button
+                            variant="outline"
+                            className="w-[90px] h-[26px] border border-[#8b8b8b] rounded-none bg-white hover:bg-gray-50 text-[12px]"
+                            onClick={() => onOrderInfo(product)}
+                          >
+                            주문정보
+                          </Button>
+                          <Button
+                            className="w-[90px] h-[26px] bg-[#8b8b8b] hover:bg-[#6f6f6f] rounded-none text-white text-[12px]"
+                            onClick={() => onShip(product)}
+                          >
+                            배송하기
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </>
           )}
 
+          {/* 매출 */}
           {activeTab === "sales" && (
             <div className="text-center py-16">
-              <h1 className="mb-8 [font-family:'SF_Pro-Bold',Helvetica] font-bold text-black text-[27px] tracking-[0] leading-[37.8px]">
+              <h1 className="mb-8 font-bold text-black text-[27px] leading-[37.8px]">
                 매출
               </h1>
-              <p className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-lg">
-                매출 현황 페이지입니다.
-              </p>
+              <p className="text-[#828282] text-lg">매출 현황 페이지입니다.</p>
             </div>
           )}
         </main>
