@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "../routes/Screen39/components/ui/badge";
 import { Button } from "../routes/Screen39/components/ui/button";
 import { Card, CardContent } from "../routes/Screen39/components/ui/card";
@@ -14,6 +15,8 @@ import {
 import { SharedHeader } from "./SharedHeader";
 
 export const CategoryPageTemplate = ({ categoryName, categoryTabs }) => {
+  const navigate = useNavigate();
+
   const products = [
     {
       id: 1,
@@ -44,6 +47,21 @@ export const CategoryPageTemplate = ({ categoryName, categoryTabs }) => {
       category: "MALE",
     },
   ];
+
+  // ✅ 상품 클릭 시 상세페이지 이동
+  const goDetail = (product) => {
+    const productForDetail = {
+      name: product?.name ?? "상품이름",
+      image: product?.image,
+      price: product?.price ?? "50,000원",
+      shipFee: "3,500원",
+      colors: ["Black", "White", "Red"],
+      sizes: ["S", "M", "L", "XL"],
+      desc:
+        "상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다.",
+    };
+    navigate("/screen126", { state: { product: productForDetail } });
+  };
 
   return (
     <div className="bg-white min-h-screen w-full">
@@ -140,22 +158,23 @@ export const CategoryPageTemplate = ({ categoryName, categoryTabs }) => {
             {products.map((product, index) => (
               <Card
                 key={product.id}
-                className="w-[232px] border-0 shadow-none bg-transparent"
+                className="w-[232px] border-0 shadow-none bg-transparent cursor-pointer"
+                onClick={() => goDetail(product)} // ✅ 상품 클릭 이벤트
               >
                 <CardContent className="p-0">
                   <div className="relative mb-6">
                     <div className="w-[231px] h-[273px] bg-white absolute top-[38px] left-0" />
                     <img
                       className="w-[232px] h-[348px] relative z-10"
-                      alt="Maneking gwa osgage"
+                      alt={product.name}
                       src={product.image}
                     />
 
-                    {/* HeartIcon Icons */}
+                    {/* Heart/Favorite Icons */}
                     <div className="absolute bottom-2 left-1 flex gap-[7px] z-20">
                       <img
                         className="w-[26px] h-[25px]"
-                        alt="Set flat outline"
+                        alt="Heart"
                         src={`https://c.animaapp.com/mfenzsacDQ5BDG/img/set-flat-outline-hearts-${index + 15}.png`}
                       />
                       <img

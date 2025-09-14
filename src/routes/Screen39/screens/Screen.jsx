@@ -1,3 +1,4 @@
+// src/routes/Screen39/screens/Screen.jsx
 import { MenuIcon, SearchIcon } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +22,6 @@ export const Screen = () => {
 
   // ✅ 햄버거 펼침에 표시할 카테고리
   const categories = ["상의", "아우터", "바지", "원피스", "악세사리", "홈웨어", "키즈"];
-
   const navigationItems = ["로그인", "회원가입", "장바구니", "마이페이지", "커뮤니티"];
 
   const categoryTabs = [
@@ -34,6 +34,7 @@ export const Screen = () => {
     { name: "기타", active: false },
   ];
 
+  // 🔧 목록에 있는 간단 상품 데이터
   const products = [
     { id: 1, image: "https://c.animaapp.com/mfenzsacDQ5BDG/img/maneking-gwa-osgage-5.png",  name: "상품 이름 (판매자가 지정하는 이름)", price: "50,000원", category: "MALE" },
     { id: 2, image: "https://c.animaapp.com/mfenzsacDQ5BDG/img/maneking-gwa-osgage-6.png",  name: "상품 이름 (판매자가 지정하는 이름)", price: "50,000원", category: "MALE" },
@@ -45,10 +46,25 @@ export const Screen = () => {
     { id: 8, image: "https://c.animaapp.com/mfenzsacDQ5BDG/img/maneking-gwa-osgage-12.png", name: "상품 이름 (판매자가 지정하는 이름)", price: "50,000원", category: "MALE" },
   ];
 
+  // ✅ 상세 페이지(126)로 보내는 핸들러
+  const goDetail = (item) => {
+    // Screen126이 기대하는 필드로 매핑
+    const productForDetail = {
+      name: item.name,
+      image: item.image,
+      price: item.price,
+      shipFee: "3,500원",
+      colors: ["Black", "White", "Red"],
+      sizes: ["S", "M", "L", "XL"],
+      desc:
+        "상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다.",
+    };
+    navigate("/screen126", { state: { product: productForDetail } });
+  };
+
   return (
     <div className="bg-white min-h-screen w-full">
       <div className="max-w-[1440px] mx-auto bg-white">
-
         {/* ===================== 햄버거 펼침 패널 ===================== */}
         <div
           className={[
@@ -58,7 +74,7 @@ export const Screen = () => {
           onMouseEnter={() => setShowNavigation(true)}
           onMouseLeave={() => setShowNavigation(false)}
         >
-          {/* 우측 상단 네비 (로그인/회원가입/…) */}
+          {/* 우측 상단 네비 */}
           <nav className="absolute top-[12px] right-[80px]">
             <div className="flex gap-4 [font-family:'Crimson_Text',Helvetica] font-normal text-black text-[15px] leading-[21px]">
               {navigationItems.map((item, index) => (
@@ -97,7 +113,7 @@ export const Screen = () => {
             </div>
           </div>
 
-          {/* ✅ 카테고리 바 (햄버거 펼치면 보이는 부분) */}
+          {/* ✅ 카테고리 바 */}
           <div className="flex items-center justify-center">
             <ul className="flex flex-wrap gap-8 md:gap-12">
               {categories.map((c) => (
@@ -116,7 +132,7 @@ export const Screen = () => {
             </ul>
           </div>
 
-          {/* 검색바 (원하면 제거 가능) */}
+          {/* 검색바 */}
           <div className="mt-6 flex justify-center">
             <div className="flex w-[296px] h-16 items-center rounded-[100px] bg-[#78788029] px-3">
               <SearchIcon className="w-4 h-4 text-[#999999] mr-2" />
@@ -208,29 +224,56 @@ export const Screen = () => {
             {products.map((product, index) => (
               <Card key={product.id} className="w-[232px] border-0 shadow-none bg-transparent">
                 <CardContent className="p-0">
-                  <div className="relative mb-6">
+                  {/* ✅ 클릭하면 상세로 이동 */}
+                  <button
+                    type="button"
+                    onClick={() => goDetail(product)}
+                    className="relative mb-6 block cursor-pointer focus:outline-none focus:ring-2 focus:ring-black"
+                    aria-label={`${product.name} 상세 보기`}
+                  >
                     <div className="w-[231px] h-[273px] bg-white absolute top-[38px] left-0" />
-                    <img className="w-[232px] h-[348px] relative z-10" alt="Maneking gwa osgage" src={product.image} />
+                    <img
+                      className="w-[232px] h-[348px] relative z-10 object-cover"
+                      alt={product.name}
+                      src={product.image}
+                    />
                     <div className="absolute bottom-2 left-1 flex gap-[7px] z-20">
-                      <img className="w-[26px] h-[25px]" alt="Set flat outline"
-                        src={index < 4
-                          ? `https://c.animaapp.com/mfenzsacDQ5BDG/img/set-flat-outline-hearts-${index + 15}.png`
-                          : `https://c.animaapp.com/mfenzsacDQ5BDG/img/set-flat-outline-hearts-${index + 1}.png`} />
-                      <img className="w-[25px] h-[26px]" alt="Favorite"
-                        src={index < 4
-                          ? `https://c.animaapp.com/mfenzsacDQ5BDG/img/favorite-4574735-${index + 6}.png`
-                          : `https://c.animaapp.com/mfenzsacDQ5BDG/img/favorite-4574735-${index - 2}.png`} />
+                      <img
+                        className="w-[26px] h-[25px]"
+                        alt="Set flat outline"
+                        src={
+                          index < 4
+                            ? `https://c.animaapp.com/mfenzsacDQ5BDG/img/set-flat-outline-hearts-${index + 15}.png`
+                            : `https://c.animaapp.com/mfenzsacDQ5BDG/img/set-flat-outline-hearts-${index + 1}.png`
+                        }
+                      />
+                      <img
+                        className="w-[25px] h-[26px]"
+                        alt="Favorite"
+                        src={
+                          index < 4
+                            ? `https://c.animaapp.com/mfenzsacDQ5BDG/img/favorite-4574735-${index + 6}.png`
+                            : `https://c.animaapp.com/mfenzsacDQ5BDG/img/favorite-4574735-${index - 2}.png`
+                        }
+                      />
                     </div>
-                  </div>
+                  </button>
 
                   <div className="w-[220px] h-[50px]">
                     <div className="w-[214px] h-[29px] mb-0">
-                      <Badge variant="secondary" className="absolute top-0 left-[3px] [font-family:'Crimson_Text',Helvetica] text-[#828282] text-[8px] bg-transparent border-0 p-0 h-auto">
+                      <Badge
+                        variant="secondary"
+                        className="absolute top-0 left-[3px] [font-family:'Crimson_Text',Helvetica] text-[#828282] text-[8px] bg-transparent border-0 p-0 h-auto"
+                      >
                         {product.category}
                       </Badge>
-                      <div className="mt-2 [font-family:'Galdeano',Helvetica] text-black text-[15px]">{product.name}</div>
+                      <div className="mt-2 [font-family:'Galdeano',Helvetica] text-black text-[15px]">
+                        {product.name}
+                      </div>
                     </div>
-                    <div className="mt-0 [font-family:'DM_Serif_Text',Helvetica] text-black text-[15px]">{product.price}</div>
+                    <div className="mt-0 [font-family:'DM_Serif_Text',Helvetica] text-black text-[15px]">
+                      {product.price}
+                    </div>
                   </div>
                 </CardContent>
               </Card>

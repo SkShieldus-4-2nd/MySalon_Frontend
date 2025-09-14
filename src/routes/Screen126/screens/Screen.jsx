@@ -1,5 +1,5 @@
 // src/routes/Screen126/screens/Screen.jsx
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useMemo as useReactMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
@@ -9,6 +9,7 @@ export const Screen = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
 
+  // --- 상품 기본값 ---
   const fallback = {
     name: "상품이름",
     image:
@@ -26,11 +27,12 @@ export const Screen = () => {
     return { ...fallback, ...p, price: p.price || fallback.price };
   }, [state]);
 
+  // --- 옵션/수량 ---
   const [color, setColor] = useState(product.colors[0]);
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(2);
 
-  // 결제 모달 상태
+  // --- 결제 모달 상태 ---
   const [openPay, setOpenPay] = useState(false);
   const [payPwd, setPayPwd] = useState("");
   const [payErr, setPayErr] = useState("");
@@ -51,14 +53,13 @@ export const Screen = () => {
     try {
       setSubmitting(true);
       // TODO: 실제 결제 API 호출 위치
-      // await api.pay({ pwd: payPwd, productId: product.id, qty, option: { color, size } });
 
       const d = new Date();
-      const orderedAt = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(
-        d.getDate()
-      ).padStart(2, "0")}`;
+      const orderedAt = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}.${String(d.getDate()).padStart(2, "0")}`;
 
-      // 주문완료 페이지로 이동 (state로 정보 전달)
       navigate("/payment", {
         state: {
           productName: product.name,
@@ -72,6 +73,69 @@ export const Screen = () => {
       setPayPwd("");
     }
   };
+
+  // =========================
+  //        REVIEW 섹션
+  // =========================
+  // 더미 리뷰 데이터 (id, rating 1~5, text, createdAt ISO)
+  const [reviews, setReviews] = useState([
+    {
+      id: 1,
+      rating: 5,
+      text:
+        "핏이 예쁘고 소재도 만족합니다. 배송도 빠르고 사진과 동일했어요. 다음에도 재구매 의사 있습니다.",
+      createdAt: "2025-09-05T13:20:00Z",
+      hasImage: true,
+    },
+    {
+      id: 2,
+      rating: 4,
+      text:
+        "여름에 시원하게 입기 좋아요. 다만 배송 패키지는 좀 더 개선되면 좋겠습니다.",
+      createdAt: "2025-09-01T09:10:00Z",
+      hasImage: false,
+    },
+    {
+      id: 3,
+      rating: 5,
+      text:
+        "사진과 동일하고 옷 재질이 기대보다 너무 좋아요. 무엇보다 핏이 정말로 예뻤습니다!",
+      createdAt: "2025-08-28T18:45:00Z",
+      hasImage: true,
+    },
+  ]);
+
+  // 정렬 상태: latest | rating
+  const [sortKey, setSortKey] = useState("latest");
+
+  const avgRating = useReactMemo(() => {
+    if (!reviews.length) return 0;
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+    return Math.round((sum / reviews.length) * 10) / 10; // 소수 1자리
+  }, [reviews]);
+
+  const likePercent = useReactMemo(() => {
+    if (!reviews.length) return 0;
+    const liked = reviews.filter((r) => r.rating >= 4).length;
+    return Math.round((liked / reviews.length) * 100);
+  }, [reviews]);
+
+  const sortedReviews = useReactMemo(() => {
+    const arr = [...reviews];
+    if (sortKey === "rating") {
+      arr.sort((a, b) => b.rating - a.rating || new Date(b.createdAt) - new Date(a.createdAt));
+    } else {
+      // latest
+      arr.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    return arr;
+  }, [reviews, sortKey]);
+
+  const deleteReview = (id) => {
+    setReviews((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const renderStars = (rating) => "★★★★★☆☆☆☆☆".slice(5 - Math.round(rating), 10 - Math.round(rating));
 
   return (
     <div className="bg-white grid justify-items-center w-screen min-h-screen">
@@ -154,7 +218,7 @@ export const Screen = () => {
             <p className="text-[13px] text-[#666] leading-[20px] mb-[18px]">
               {product.desc}
             </p>
-            {/* Separator 대체 */}
+            {/* 구분선 */}
             <div className="h-px w-full bg-[#e5e7eb] mb-[18px]" />
 
             <div className="text-[15px] space-y-[14px]">
@@ -206,7 +270,7 @@ export const Screen = () => {
               {/* 수량 */}
               <div className="flex items-center">
                 <div className="w-[90px] text-[#333]">수량</div>
-                <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3">
                   <button
                     className="w-6 h-6 border rounded"
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
@@ -224,7 +288,7 @@ export const Screen = () => {
               </div>
             </div>
 
-            {/* 라인 */}
+            {/* 구분선 */}
             <div className="h-px w-full bg-[#e5e7eb] mt-[18px] mb-[14px]" />
 
             {/* TOTAL + 구매하기 */}
@@ -248,7 +312,6 @@ export const Screen = () => {
                 >
                   👜
                 </Button>
-                {/* 구매하기 → 모달 오픈 */}
                 <Button
                   className="w-[230px] h-[48px] rounded-none bg-[#b9b9b9] text-white text-[16px] hover:bg-[#a4a4a4]"
                   onClick={openPayModal}
@@ -256,6 +319,99 @@ export const Screen = () => {
                   구매하기
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* =========================
+                REVIEW 섹션
+        ========================= */}
+        <div className="mt-[60px] px-[100px]">
+          <h2 className="text-[20px] font-semibold mb-3">REVIEW</h2>
+
+          {/* 상단 라인 + 필터 바 */}
+          <div className="border-t pt-[10px] flex items-center flex-wrap gap-3 text-[12px] text-[#666]">
+            <label className="flex items-center gap-1 cursor-pointer">
+              <input
+                type="radio"
+                name="sort"
+                checked={sortKey === "latest"}
+                onChange={() => setSortKey("latest")}
+              />
+              최신순
+            </label>
+            <label className="flex items-center gap-1 cursor-pointer">
+              <input
+                type="radio"
+                name="sort"
+                checked={sortKey === "rating"}
+                onChange={() => setSortKey("rating")}
+              />
+              평점순
+            </label>
+            <select className="border rounded px-2 py-[2px]">
+              <option>옵션 1</option>
+              <option>옵션 2</option>
+            </select>
+            <select className="border rounded px-2 py-[2px]">
+              <option>필터</option>
+              <option>옵션</option>
+            </select>
+          </div>
+
+          {/* 좌측 평점 카드 + 우측 리뷰 리스트 */}
+          <div className="grid grid-cols-12 gap-8 mt-6">
+            {/* 좌측 별/점수/작성 버튼 */}
+            <div className="col-span-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="text-[32px]">⭐</div>
+                <div className="text-[28px] font-semibold">{avgRating.toFixed(1)}</div>
+              </div>
+              <div className="text-[12px] text-[#666] mb-3">
+                {likePercent}% 구매자가 이 상품을 좋아합니다.
+              </div>
+              <Button
+                variant="outline"
+                className="w-[160px] h-[34px] rounded-none text-[13px]"
+                onClick={() => navigate("/review")}
+              >
+                리뷰 작성하기
+              </Button>
+            </div>
+
+            {/* 우측 리뷰 리스트 */}
+            <div className="col-span-8 space-y-5">
+              {sortedReviews.map((r) => (
+                <div key={r.id} className="flex gap-4 items-start border p-4">
+                  <div className="w-[64px] h-[64px] bg-[#e5e5e5] flex items-center justify-center text-xs">
+                    {r.hasImage ? "IMG" : "NO\nIMG"}
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[13px]">
+                      {"★".repeat(r.rating)}
+                      {"☆".repeat(5 - r.rating)}{" "}
+                      {r.rating >= 4 ? "아주 좋아요" : r.rating === 3 ? "보통이에요" : "별로예요"}
+                    </div>
+                    <div className="text-[12px] text-[#666] leading-[18px] whitespace-pre-wrap">
+                      {r.text}
+                    </div>
+                    <div className="text-[11px] text-[#999] mt-1">
+                      {new Date(r.createdAt).toLocaleDateString("ko-KR")}
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="h-8 rounded-none"
+                    onClick={() => deleteReview(r.id)}
+                  >
+                    삭제
+                  </Button>
+                </div>
+              ))}
+
+              {!sortedReviews.length && (
+                <div className="text-sm text-[#666]">아직 리뷰가 없습니다.</div>
+              )}
             </div>
           </div>
         </div>
