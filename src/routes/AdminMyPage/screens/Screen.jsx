@@ -66,12 +66,53 @@ const ProductRegisterForm = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
+
+    const userString = localStorage.getItem("user");
+    if (!userString) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    const user = JSON.parse(userString);
+    const userNum = user?.userNum;
+
+    if (!userNum) {
+      alert("사용자 정보를 가져올 수 없습니다. 다시 로그인해주세요.");
+      return;
+    }
+
     if (variants.length === 0) {
       alert("하나 이상의 상품 옵션을 추가해주세요.");
       return;
     }
-    console.log("상품등록 payload:", { ...form, variants });
-    alert("등록 API 연동은 추후 진행하세요!");
+
+    const payload = {
+      userNum: userNum,
+      productName: form.name,
+      price: Number(form.price) || 0,
+      deliveryFee: Number(form.shippingFee) || 0,
+      mainImage: form.image ? form.image.name : "placeholder.jpg", // Placeholder for actual upload
+      description: form.description,
+      gender: "ALL", // Default value, not in form
+      category: "ALL", // Default value, not in form
+      categoryLow: "ALL", // Default value, not in form
+      productDetails: variants.map(v => ({
+        color: v.color,
+        size: v.size,
+        count: v.maxQty
+      }))
+    };
+
+    console.log("API 요청 Payload:", payload);
+    alert("API 명세에 따라 요청 데이터를 구성했습니다. 콘솔을 확인해주세요.");
+    
+    // This would be the actual fetch call
+    // const formData = new FormData();
+    // formData.append('productData', new Blob([JSON.stringify(payload)], { type: "application/json" }));
+    // if (form.image) {
+    //   formData.append('imageFile', form.image);
+    // }
+    // fetch('/api/products/create', { method: 'POST', body: formData })
+    //  .then(...)
   };
 
   return (
