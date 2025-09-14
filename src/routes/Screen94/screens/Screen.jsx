@@ -1,4 +1,5 @@
-import React, { useRef, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -9,20 +10,23 @@ import { Separator } from "../components/ui/separator";
 export const Screen = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const userNum = 2; // 예시: 로그인된 유저 번호
 
   const [formData, setFormData] = useState({
-    userId: "HONG1234",
+    userId: "",
     password: "",
     passwordConfirm: "",
     paymentPassword: "",
-    name: "홍길동",
+    name: "",
     gender: "male",
-    height: "180",
-    weight: "70",
+    height: "",
+    weight: "",
     storeName: "",
     userType: "buyer",
-    profileImageUrl: "" // ▶ 프로필 사진 미리보기 URL
+    profileImageUrl: ""
   });
+
+  const [loading, setLoading] = useState(true);
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
@@ -43,18 +47,73 @@ export const Screen = () => {
     setFormData(prev => ({ ...prev, profileImageUrl: url }));
   };
 
-  const handleSubmit = () => {
-    if (formData.password !== formData.passwordConfirm) {
+  // 페이지 로드 시 유저 정보 가져오기
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/api/users/${userNum}`);
+        const user = res.data;
+        setFormData({
+          userId: user.id || "",
+          password: "",
+          passwordConfirm: "",
+          paymentPassword: user.secondPassword || "",
+          name: user.userName || "",
+          gender: user.gender?.toLowerCase() || "male",
+          height: user.tall || "",
+          weight: user.weight || "",
+          storeName: user.storeName || "",
+          userType: user.type?.toLowerCase() || "buyer",
+          profileImageUrl: user.profileImageUrl || ""
+        });
+        setLoading(false);
+      } catch (error) {
+        console.error("사용자 정보 로드 실패:", error);
+        alert("사용자 정보를 가져오는데 실패했습니다.");
+      }
+    };
+    fetchUser();
+  }, [userNum]);
+
+  // 수정 API 호출
+  const handleSubmit = async () => {
+    if (formData.password && formData.password !== formData.passwordConfirm) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-    alert('프로필이 수정되었습니다!');
-    navigate('/mypage');
+
+    const payload = {
+      id: formData.userId,
+      userName: formData.name,
+      secondPassword: formData.paymentPassword,
+      password: formData.password || undefined,
+      gender: formData.gender?.toUpperCase() || null,
+      tall: Number(formData.height) || null,
+      weight: Number(formData.weight) || null,
+      storeName: formData.userType === "seller" ? formData.storeName : null,
+      type: formData.userType.toUpperCase(),
+      profileImageUrl: formData.profileImageUrl || null
+    };
+
+    console.log("서버로 보낼 데이터:", payload); // 🔍 여기서 확인
+
+    try {
+      await axios.put(`http://localhost:8080/api/users/${userNum}`, payload);
+      alert('프로필이 수정되었습니다!');
+      navigate('/mypage');
+    } catch (error) {
+      console.error("사용자 정보 수정 실패:", error);
+      alert('수정에 실패했습니다.');
+    }
   };
+
+
+  if (loading) return <div className="text-center mt-20">로딩 중...</div>;
 
   return (
     <div className="bg-white grid justify-items-center [align-items:start] w-screen">
       <div className="bg-white w-[1440px] h-[1216px] relative">
+        {/* 네비게이션 */}
         <nav className="absolute top-[33px] left-[1080px] [font-family:'Crimson_Text',Helvetica] font-normal text-black text-[15px] tracking-[0] leading-[21px] whitespace-nowrap">
           <div className="flex gap-4">
             {navigationItems.map((item, index) => (
@@ -70,16 +129,15 @@ export const Screen = () => {
           </div>
         </nav>
 
+        {/* 헤더 */}
         <header className="absolute w-[146px] h-[118px] top-[135px] left-[649px]">
           <div className="relative w-[142px] h-[118px]">
-            <h1 className="absolute w-[142px] top-3 left-0 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[25.5px] text-center tracking-[0] leading-[35.8px] whitespace-nowrap">
+            <h1 className="absolute w-[142px] top-3 left-0 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[25.5px] text-center leading-[35.8px] whitespace-nowrap">
               MY SALON
             </h1>
-
-            <p className="w-[87px] top-0 left-7 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[9.5px] leading-[13.3px] absolute text-center tracking-[0] whitespace-nowrap">
+            <p className="w-[87px] top-0 left-7 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[9.5px] leading-[13.3px] absolute text-center whitespace-nowrap">
               당신만을 위한 옷장
             </p>
-
             <img
               className="absolute w-[66px] h-[66px] top-[52px] left-[37px]"
               alt="Main icon"
@@ -108,11 +166,8 @@ export const Screen = () => {
                   id="buyer"
                   className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
                 />
-                <Label
-                  htmlFor="buyer"
-                  className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
-                >
-                  판매자
+                <Label htmlFor="buyer" className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] whitespace-nowrap">
+                  구매자
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
@@ -121,11 +176,8 @@ export const Screen = () => {
                   id="seller"
                   className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
                 />
-                <Label
-                  htmlFor="seller"
-                  className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
-                >
-                  구매자
+                <Label htmlFor="seller" className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] whitespace-nowrap">
+                  판매자
                 </Label>
               </div>
             </div>
@@ -138,10 +190,7 @@ export const Screen = () => {
 
             {/* 아이디 */}
             <div className="absolute top-[493px] left-[471px]">
-              <Label
-                htmlFor="username"
-                className="w-14 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
+              <Label htmlFor="username" className="w-14 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 whitespace-nowrap">
                 아이디
               </Label>
             </div>
@@ -154,10 +203,7 @@ export const Screen = () => {
 
             {/* 비밀번호 */}
             <div className="absolute top-[553px] left-[462px]">
-              <Label
-                htmlFor="password"
-                className="w-[74px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
+              <Label htmlFor="password" className="w-[74px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 whitespace-nowrap">
                 비밀번호
               </Label>
             </div>
@@ -171,10 +217,7 @@ export const Screen = () => {
 
             {/* 비밀번호 확인 */}
             <div className="absolute top-[613px] left-[441px]">
-              <Label
-                htmlFor="passwordConfirm"
-                className="w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
+              <Label htmlFor="passwordConfirm" className="w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 whitespace-nowrap">
                 비밀번호 확인
               </Label>
             </div>
@@ -193,10 +236,7 @@ export const Screen = () => {
 
             {/* 결제 비밀번호 */}
             <div className="absolute top-[673px] left-[441px]">
-              <Label
-                htmlFor="paymentPassword"
-                className="w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
+              <Label htmlFor="paymentPassword" className="w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 whitespace-nowrap">
                 결제 비밀번호
               </Label>
             </div>
@@ -213,10 +253,7 @@ export const Screen = () => {
 
             {/* 이름 */}
             <div className="absolute top-[733px] left-[437px]">
-              <Label
-                htmlFor="name"
-                className="w-[125px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
+              <Label htmlFor="name" className="w-[125px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 whitespace-nowrap">
                 이름(닉네임)
               </Label>
             </div>
@@ -224,179 +261,104 @@ export const Screen = () => {
               id="name"
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
-              className="top-[734px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+              className="top-[732px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
             />
 
-            {/* ✅ 전화번호 줄을 → 프로필 사진 + 사진 업로드 버튼으로 교체 */}
-            <div className="absolute top-[794px] left-[462px]">
-              <Label className="w-[74px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
-                프로필 사진
-              </Label>
-            </div>
-            <div className="absolute top-[792px] left-[606px] flex items-center gap-3">
-              {/* 미리보기 영역 */}
-              {formData.profileImageUrl ? (
-                <img
-                  src={formData.profileImageUrl}
-                  alt="프로필 미리보기"
-                  className="w-10 h-10 rounded-full object-cover border border-[#d9d9d9]"
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-full border border-[#d9d9d9] bg-[#f5f5f5] flex items-center justify-center text-[10px] text-[#777]">
-                  사진
-                </div>
-              )}
-
-              {/* 숨김 파일 입력 */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-
-              {/* 업로드 버튼 */}
-              <Button
-                variant="outline"
-                className="h-8 px-3 rounded-[6px] border-[0.6px] border-[#828282] text-[12px] bg-white hover:bg-gray-50"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                사진 업로드
-              </Button>
-            </div>
-            {/* ✅ 여기까지 대체 */}
-
             {/* 성별 */}
-            <div className="absolute top-[854px] left-[481px]">
-              <Label className="w-[37px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
+            <div className="absolute top-[792px] left-[437px]">
+              <Label className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 whitespace-nowrap">
                 성별
               </Label>
             </div>
-            <RadioGroup
-              className="absolute w-[184px] h-[22px] top-[859px] left-[606px]"
-              value={formData.gender}
-              onValueChange={(value) => handleInputChange('gender', value)}
-            >
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem
-                    value="male"
-                    id="male"
-                    className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
-                  />
-                  <Label
-                    htmlFor="male"
-                    className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
-                  >
-                    남자
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem
-                    value="female"
-                    id="female"
-                    className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
-                  />
-                  <Label
-                    htmlFor="female"
-                    className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] leading-[21px] text-center tracking-[0] whitespace-nowrap"
-                  >
-                    여자
-                  </Label>
-                </div>
-              </div>
-            </RadioGroup>
+            <div className="absolute top-[791px] left-[606px] flex gap-10">
+              <label>
+                <input
+                  type="radio"
+                  name="gender"
+                  value="male"
+                  checked={formData.gender === "male"}
+                  onChange={(e) => handleInputChange('gender', e.target.value)}
+                /> 남
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="gender"
+                  value="female"
+                  checked={formData.gender === "female"}
+                  onChange={(e) => handleInputChange('gender', e.target.value)}
+                /> 여
+              </label>
+            </div>
 
             {/* 키 */}
-            <div className="absolute top-[917px] left-[481px]">
-              <Label
-                htmlFor="height"
-                className="w-[37px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                키
+            <div className="absolute top-[851px] left-[462px]">
+              <Label htmlFor="height" className="w-[74px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 whitespace-nowrap">
+                키(cm)
               </Label>
             </div>
-            <div className="absolute w-32 h-8 top-[914px] left-[606px] border-[0.6px] border-solid border-[#828282]">
-              <Input
-                id="height"
-                type="number"
-                value={formData.height}
-                onChange={(e) => handleInputChange('height', e.target.value)}
-                className="w-full h-full border-none rounded-none pr-8"
-              />
-              <div className="absolute top-1 right-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px] whitespace-nowrap">
-                cm
-              </div>
-            </div>
+            <Input
+              id="height"
+              value={formData.height}
+              onChange={(e) => handleInputChange('height', e.target.value)}
+              className="top-[850px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+            />
 
             {/* 몸무게 */}
-            <div className="absolute top-[914px] left-[773px]">
-              <Label
-                htmlFor="weight"
-                className="w-16 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                몸무게
+            <div className="absolute top-[911px] left-[437px]">
+              <Label htmlFor="weight" className="w-[125px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 whitespace-nowrap">
+                몸무게(kg)
               </Label>
             </div>
-            <div className="absolute w-32 h-8 top-[914px] left-[876px] border-[0.6px] border-solid border-[#828282]">
-              <Input
-                id="weight"
-                type="number"
-                value={formData.weight}
-                onChange={(e) => handleInputChange('weight', e.target.value)}
-                className="w-full h-full border-none rounded-none pr-8"
-              />
-              <div className="absolute top-1 right-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px] whitespace-nowrap">
-                kg
-              </div>
-            </div>
+            <Input
+              id="weight"
+              value={formData.weight}
+              onChange={(e) => handleInputChange('weight', e.target.value)}
+              className="top-[910px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+            />
 
-            {/* 스토어 이름 */}
-            <div className="absolute w-[116px] h-[30px] top-[980px] left-[441px]">
-              <Label
-                htmlFor="storeName"
-                className={`w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-xl leading-7 text-center tracking-[0] whitespace-nowrap ${
-                  formData.userType === "seller" ? "text-[#999999]" : "text-black"
-                }`}
-              >
-                스토어 이름
+            {/* 가게 이름 */}
+            <div className="absolute top-[971px] left-[437px]">
+              <Label htmlFor="storeName" className="w-[125px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 whitespace-nowrap">
+                가게 이름
               </Label>
-              <Input
-                id="storeName"
-                value={formData.storeName}
-                onChange={(e) => handleInputChange('storeName', e.target.value)}
-                disabled={formData.userType === "seller"}
-                className={`absolute top-[-1px] left-[165px] w-[398px] h-8 border-[0.6px] border-solid rounded-none ${
-                  formData.userType === "seller"
-                    ? "border-[#d0d0d0] bg-[#f5f5f5] text-[#999999] cursor-not-allowed"
-                    : "border-[#828282] bg-white"
-                }`}
-              />
             </div>
-          </section>
+            <Input
+              id="storeName"
+              value={formData.storeName}
+              disabled={formData.userType !== "seller"}
+              onChange={(e) => handleInputChange('storeName', e.target.value)}
+              placeholder={formData.userType === "seller" ? "" : "구매자는 입력 불가"}
+              className="top-[970px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+            />
 
-          {/* 하단 버튼 */}
-          <div className="absolute w-[539px] h-[60px] top-[1049px] left-[466px]">
-            <Button
-              variant="outline"
-              className="absolute w-[242px] h-[60px] top-0 left-0 border border-solid border-[#828282] rounded-none bg-white hover:bg-gray-50 h-auto"
-              onClick={() => navigate('/mypage')}
-            >
-              <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
-                취소
-              </span>
-            </Button>
+            {/* 프로필 이미지 */}
+            <div className="absolute top-[1031px] left-[606px] flex items-center gap-4">
+              <Button onClick={() => fileInputRef.current.click()}>사진 업로드</Button>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              {formData.profileImageUrl && (
+                <img
+                  src={formData.profileImageUrl}
+                  alt="프로필"
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+              )}
+            </div>
 
+            {/* 제출 버튼 */}
             <Button
-              className="absolute w-[242px] h-[60px] top-0 left-[293px] bg-[#828282] hover:bg-[#707070] rounded-none h-auto"
+              className="absolute top-[1101px] left-[606px] w-[398px] h-12 bg-black text-white font-bold"
               onClick={handleSubmit}
             >
-              <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-white text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
-                수정하기
-              </span>
+              수정 완료
             </Button>
-          </div>
+          </section>
         </main>
       </div>
     </div>
