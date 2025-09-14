@@ -174,7 +174,8 @@ export const Screen = () => {
   return (
     <div className="bg-white grid justify-items-center [align-items:start] w-screen">
       <div className="bg-white w-[1440px] h-[1216px] relative">
-        <nav className="absolute top-[33px] left-[1080px] [font-family:'Crimson_Text',Helvetica] font-normal text-black text-[15px] tracking-[0] leading-[21px] whitespace-nowrap">
+        {/* 네비게이션 */}
+        <nav className="absolute top-[33px] left-[1080px]">
           <div className="flex gap-4">
             {navigationItems.map((item, index) => (
               <Button
@@ -189,29 +190,19 @@ export const Screen = () => {
           </div>
         </nav>
 
+        {/* 로고 */}
         <header className="absolute w-[146px] h-[118px] top-[135px] left-[649px]">
-          <div className="relative w-[142px] h-[118px]">
-            <h1 className="absolute w-[142px] top-3 left-0 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[25.5px] text-center tracking-[0] leading-[35.8px] whitespace-nowrap">
-              MY SALON
-            </h1>
-
-            <p className="w-[87px] top-0 left-7 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[9.5px] leading-[13.3px] absolute text-center tracking-[0] whitespace-nowrap">
-              당신만을 위한 옷장
-            </p>
-
-            <img
-              className="absolute w-[66px] h-[66px] top-[52px] left-[37px]"
-              alt="Main icon"
-              src="https://c.animaapp.com/mfeqluynHQoI9d/img/main-icon-1.png"
-            />
-          </div>
+          <h1 className="text-center text-[25.5px] font-normal">MY SALON</h1>
+          <p className="text-center text-[9.5px]">당신만을 위한 옷장</p>
+          <img
+            className="absolute w-[66px] h-[66px] top-[52px] left-[37px]"
+            alt="Main icon"
+            src="https://c.animaapp.com/mfeqluynHQoI9d/img/main-icon-1.png"
+          />
         </header>
 
         <main>
-          <h2 className="top-[282px] left-[195px] [font-family:'SF_Pro-Bold',Helvetica] font-bold text-[#222222] text-[40px] leading-[56px] absolute text-center tracking-[0] whitespace-nowrap">
-            회원가입
-          </h2>
-
+          <h2 className="absolute top-[282px] left-[195px] text-[40px] font-bold">회원가입</h2>
           <Separator className="absolute w-[1115px] h-px top-[352px] left-[195px] bg-gray-300" />
 
           {/* 역할 선택 */}
@@ -254,6 +245,7 @@ export const Screen = () => {
             </div>
           </RadioGroup>
 
+          {/* 입력 폼 */}
           <section>
             <h3 className="top-[410px] left-[372px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[35px] leading-[49px] absolute text-center tracking-[0] whitespace-nowrap">
               기본정보
@@ -479,3 +471,4 @@ export const Screen = () => {
     </div>
   );
 };
+
