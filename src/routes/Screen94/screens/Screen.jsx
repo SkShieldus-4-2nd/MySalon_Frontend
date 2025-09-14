@@ -10,7 +10,7 @@ import { Separator } from "../components/ui/separator";
 export const Screen = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const userNum = 2; // 예시: 로그인된 유저 번호
+
 
   const [formData, setFormData] = useState({
     userId: "",
@@ -51,7 +51,12 @@ export const Screen = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/users/${userNum}`);
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`http://localhost:8080/api/users/user-info`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
         const user = res.data;
         setFormData({
           userId: user.id || "",
@@ -73,9 +78,10 @@ export const Screen = () => {
       }
     };
     fetchUser();
-  }, [userNum]);
+  }, []);
 
   // 수정 API 호출
+  const token = localStorage.getItem("token");
   const handleSubmit = async () => {
     if (formData.password && formData.password !== formData.passwordConfirm) {
       alert('비밀번호가 일치하지 않습니다.');
@@ -98,7 +104,12 @@ export const Screen = () => {
     console.log("서버로 보낼 데이터:", payload); // 🔍 여기서 확인
 
     try {
-      await axios.put(`http://localhost:8080/api/users/${userNum}`, payload);
+
+      await axios.put(`http://localhost:8080/api/users/edit-profile`, payload,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       alert('프로필이 수정되었습니다!');
       navigate('/mypage');
     } catch (error) {

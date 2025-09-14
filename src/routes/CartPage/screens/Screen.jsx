@@ -29,7 +29,12 @@ export const Screen = () => {
   // 장바구니 불러오기
   const fetchCart = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/cart/${userNum}`);
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`http://localhost:8080/api/cart/user-cart`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setCartItems(res.data);
       fetchTotalPrice(); // 장바구니 로드 시 총합도 가져오기
     } catch (error) {
@@ -40,8 +45,11 @@ export const Screen = () => {
   // 총합 가격 API
   const fetchTotalPrice = async () => {
     try {
+      const token = localStorage.getItem("token");
       const res = await axios.get(`http://localhost:8080/api/cart/total`, {
-        params: { userNum }
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       setTotalPrice(res.data);
     } catch (error) {
@@ -60,10 +68,16 @@ export const Screen = () => {
     if (isNaN(newQuantity) || newQuantity < 1) return; // 유효하지 않으면 중단
 
     try {
+      const token = localStorage.getItem("token");
       const res = await axios.patch(
         "http://localhost:8080/api/cart/update-count",
         null,
-        { params: { userNum, productDetailNum, count: newQuantity } }
+        {
+          params: { productDetailNum, count: newQuantity },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       setCartItems((prev) =>
@@ -84,8 +98,12 @@ export const Screen = () => {
   // 상품 삭제
   const removeItem = async (productDetailNum) => {
     try {
+      const token = localStorage.getItem("token");
       await axios.delete("http://localhost:8080/api/cart", {
         data: { userNum, productDetailNum },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       setCartItems((prev) =>
         prev.filter((item) => item.productDetailNum !== productDetailNum)
@@ -99,11 +117,15 @@ export const Screen = () => {
   // 선택 여부 변경
   const toggleSelection = async (productDetailNum, isChecked) => {
     try {
+      const token = localStorage.getItem("token");
       const res = await axios.patch(
         "http://localhost:8080/api/cart/selection",
         null,
         {
           params: { userNum, productDetailNum, isSelected: isChecked },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       setCartItems((prev) =>
@@ -116,6 +138,38 @@ export const Screen = () => {
       fetchTotalPrice(); // 선택 변경 후 총합 갱신
     } catch (error) {
       console.error("선택 변경 실패:", error);
+    }
+  };
+
+  const handlePayment = async () => {
+    const token = localStorage.getItem("token");
+    const orderItems = cartItems
+      .filter((item) => item.selected)
+      .map((item) => ({
+        productDetailNum: item.productDetailNum,
+        count: item.count,
+      }));
+
+    if (orderItems.length === 0) {
+      alert("결제할 상품을 선택해주세요.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/orders/create",
+        { orderItems },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      navigate("/screen133", { state: { orderData: response.data } });
+    } catch (error) {
+      console.error("결제 실패:", error);
+      alert("결제에 실패했습니다.");
     }
   };
 
@@ -283,7 +337,7 @@ export const Screen = () => {
               <div className="flex justify-center mt-12">
                 <Button
                   className="bg-[#828282] hover:bg-[#707070] text-white text-[25px] px-12 py-3 rounded-[5px] h-auto"
-                  onClick={() => navigate("/payment")}
+                  onClick={handlePayment}
                 >
                   결제하기
                 </Button>
@@ -295,3 +349,4 @@ export const Screen = () => {
     </div>
   );
 };
+

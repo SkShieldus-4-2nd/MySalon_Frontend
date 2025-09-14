@@ -71,11 +71,15 @@ export const CategoryPageTemplate = ({ categoryName, categoryTabs }) => {
 
   const fetchProducts = async () => {
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:8080/api/products", {
         params: {
           category: categoryMap[categoryName] || null,
           categoryLow: categoryLowMap[activeTab] || null,
           gender: genderMap[selectedGender] || null,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
       });
       const productsWithLiked = response.data.map(p => ({ ...p, liked: false }));
@@ -93,11 +97,20 @@ export const CategoryPageTemplate = ({ categoryName, categoryTabs }) => {
   useEffect(() => {
     const fetchProductRatings = async () => {
       try {
+        const token = localStorage.getItem("token");
         const ratingsData = {};
         for (const product of products) {
           const [scoreRes, countRes] = await Promise.all([
-            axios.get(`http://localhost:8080/api/reviews/product/${product.productNum}/average-score`),
-            axios.get(`http://localhost:8080/api/reviews/product/${product.productNum}/count`),
+            axios.get(`http://localhost:8080/api/reviews/product/${product.productNum}/average-score`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }),
+            axios.get(`http://localhost:8080/api/reviews/product/${product.productNum}/count`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }),
           ]);
           ratingsData[product.productNum] = {
             averageScore: scoreRes.data,

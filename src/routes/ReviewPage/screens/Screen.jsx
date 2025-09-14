@@ -12,7 +12,7 @@ export const Screen = () => {
   const location = useLocation();
   const { product_detail_num } = useParams();
   const fileInputRef = useRef(null);
-  const { user, loading, authFetch } = useAuth();
+  const { token, loading, authFetch } = useAuth();
 
   const isEdit = new URLSearchParams(location.search).get("mode") === "edit";
   const passedReview = location.state?.review || null;
@@ -25,7 +25,7 @@ export const Screen = () => {
   useEffect(() => {
     if (loading) return; // Wait until auth state is loaded
 
-    if (!user) {
+    if (!token) {
         alert("로그인이 필요합니다.");
         navigate("/login");
     }
@@ -33,7 +33,7 @@ export const Screen = () => {
     if (isEdit && passedReview) {
       // setReviewText(passedReview.content ?? "");
     }
-  }, [isEdit, passedReview, user, navigate, loading]);
+  }, [isEdit, passedReview, token, navigate, loading]);
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
@@ -52,7 +52,7 @@ export const Screen = () => {
   };
 
   const handleSubmit = async () => {
-    if (!user) {
+    if (!token) {
         alert("로그인이 필요합니다.");
         return navigate("/login");
     }
@@ -62,7 +62,6 @@ export const Screen = () => {
     const formData = new FormData();
     formData.append('score', rating);
     formData.append('text', reviewText);
-    formData.append('userNum', user.userNum);
     if (imageFile) {
       formData.append('reviewImage', imageFile);
     }

@@ -1,6 +1,6 @@
 import { MenuIcon, MicIcon, SearchIcon } from "lucide-react";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -9,6 +9,8 @@ import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
 
 export const Screen = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { orderData } = location.state || {};
 
   const navigationItems = [
     "로그인",
@@ -97,93 +99,118 @@ export const Screen = () => {
           </div>
         </div>
 
-        {/* Login Section Layout */}
-        <div className="absolute w-[318px] h-[575px] top-[292px] left-[232px]">
-          <div className="absolute top-[65px] left-[194px] [font-family:'SF_Pro-Bold',Helvetica] font-bold text-[#222222] text-[40px] text-center tracking-[0] leading-[56px] whitespace-nowrap">
-            LOGIN
-          </div>
-          <Separator className="absolute w-[318px] h-px top-[116px] left-0" />
-          <Separator
-            orientation="vertical"
-            className="absolute w-px h-[575px] top-0 left-[175px]"
-          />
-        </div>
-
-        {/* Login Form Card */}
-        <Card className="absolute w-[452px] h-[509px] top-[358px] left-[742px] border-[1.5px] border-solid border-black">
-          <CardContent className="p-12">
-            {/* Member Login Section */}
-            <div className="w-[331px] h-[129px] mb-8">
-              <h2 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl text-center tracking-[0] leading-7 whitespace-nowrap mb-[38px]">
-                회원 로그인
-              </h2>
-
-              <div className="space-y-[11px] mb-4">
-                <Input
-                  placeholder="아이디"
-                  className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#d9d9d9] text-[13px] text-center tracking-[0] leading-[18.2px]"
-                />
-                <Input
-                  type="password"
-                  placeholder="비밀번호"
-                  className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#d9d9d9] text-[13px] text-center tracking-[0] leading-[18.2px]"
-                />
+        {orderData ? (
+          <Card className="absolute w-[452px] top-[358px] left-[742px] border-[1.5px] border-solid border-black">
+            <CardContent className="p-12 text-center">
+              <h2 className="text-2xl font-bold mb-6">주문 완료</h2>
+              <div className="space-y-4 text-left mx-auto max-w-sm">
+                <div className="flex justify-between">
+                  <span className="font-semibold">주문 번호:</span>
+                  <span>{orderData.orderNum}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">주문자:</span>
+                  <span>{orderData.userName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">주문 시간:</span>
+                  <span>{new Date(orderData.orderedAt).toLocaleString()}</span>
+                </div>
               </div>
-
-              <Button className="absolute top-[65px] right-[52px] w-[97px] h-[75px] bg-[url(https://c.animaapp.com/mfexm2mi2gPjcW/img/rectangle-30.svg)] bg-[100%_100%] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-white text-[15px] text-center tracking-[0] leading-[21px] h-auto">
-                로그인
-              </Button>
-
-              <div className="text-black text-[8px] text-center tracking-[0] leading-[11.2px] mt-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal">
-                아이디 또는 비밀번호가 틀렸습니다.
+              <Button className="mt-8" onClick={() => navigate('/')}>홈으로</Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            {/* Login Section Layout */}
+            <div className="absolute w-[318px] h-[575px] top-[292px] left-[232px]">
+              <div className="absolute top-[65px] left-[194px] [font-family:'SF_Pro-Bold',Helvetica] font-bold text-[#222222] text-[40px] text-center tracking-[0] leading-[56px] whitespace-nowrap">
+                LOGIN
               </div>
+              <Separator className="absolute w-[318px] h-px top-[116px] left-0" />
+              <Separator
+                orientation="vertical"
+                className="absolute w-px h-[575px] top-0 left-[175px]"
+              />
             </div>
 
-            {/* Separator Line */}
-            <Separator className="w-[345px] mb-4" />
+            {/* Login Form Card */}
+            <Card className="absolute w-[452px] h-[509px] top-[358px] left-[742px] border-[1.5px] border-solid border-black">
+              <CardContent className="p-12">
+                {/* Member Login Section */}
+                <div className="w-[331px] h-[129px] mb-8">
+                  <h2 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl text-center tracking-[0] leading-7 whitespace-nowrap mb-[38px]">
+                    회원 로그인
+                  </h2>
 
-            {/* Tab Navigation */}
-            <Tabs defaultValue="signup" className="w-[351px] mb-6">
-              <TabsList className="grid w-full grid-cols-3 h-[26px] p-0 bg-transparent">
-                {tabItems.map((tab) => (
-                  <TabsTrigger
-                    key={tab.value}
-                    value={tab.value}
-                    className={`w-[99px] h-[26px] ${tab.bgColor} [font-family:'SF_Pro-Regular',Helvetica] font-normal text-white text-[10px] text-center tracking-[0] leading-[14px] data-[state=active]:${tab.bgColor} data-[state=inactive]:${tab.bgColor}`}
-                  >
-                    {tab.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
+                  <div className="space-y-[11px] mb-4">
+                    <Input
+                      placeholder="아이디"
+                      className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#d9d9d9] text-[13px] text-center tracking-[0] leading-[18.2px]"
+                    />
+                    <Input
+                      type="password"
+                      placeholder="비밀번호"
+                      className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#d9d9d9] text-[13px] text-center tracking-[0] leading-[18.2px]"
+                    />
+                  </div>
 
-            {/* Non-member Order Inquiry Section */}
-            <div className="w-[361px] h-[340px]">
-              <h2 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl text-center tracking-[0] leading-7 whitespace-nowrap mb-[38px]">
-                비회원 주문조회
-              </h2>
+                  <Button className="absolute top-[65px] right-[52px] w-[97px] h-[75px] bg-[url(https://c.animaapp.com/mfexm2mi2gPjcW/img/rectangle-30.svg)] bg-[100%_100%] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-white text-[15px] text-center tracking-[0] leading-[21px] h-auto">
+                    로그인
+                  </Button>
 
-              <div className="space-y-[11px] mb-4">
-                <Input
-                  placeholder="주문자명"
-                  className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#d9d9d9] text-[13px] text-center tracking-[0] leading-[18.2px]"
-                />
-                <Input
-                  placeholder="전화번호"
-                  className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#d9d9d9] text-[13px] text-center tracking-[0] leading-[18.2px]"
-                />
-              </div>
+                  <div className="text-black text-[8px] text-center tracking-[0] leading-[11.2px] mt-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal">
+                    아이디 또는 비밀번호가 틀렸습니다.
+                  </div>
+                </div>
 
-              <Button className="absolute bottom-[82px] right-[52px] w-[97px] h-[75px] bg-[url(https://c.animaapp.com/mfexm2mi2gPjcW/img/rectangle-29.svg)] bg-[100%_100%] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] text-center tracking-[0] leading-[21px] h-auto">
-                확인
-              </Button>
+                {/* Separator Line */}
+                <Separator className="w-[345px] mb-4" />
 
-              <div className="text-black text-[8px] text-center tracking-[0] leading-[11.2px] mt-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal">
-                조회 내역이 없습니다.
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                {/* Tab Navigation */}
+                <Tabs defaultValue="signup" className="w-[351px] mb-6">
+                  <TabsList className="grid w-full grid-cols-3 h-[26px] p-0 bg-transparent">
+                    {tabItems.map((tab) => (
+                      <TabsTrigger
+                        key={tab.value}
+                        value={tab.value}
+                        className={`w-[99px] h-[26px] ${tab.bgColor} [font-family:'SF_Pro-Regular',Helvetica] font-normal text-white text-[10px] text-center tracking-[0] leading-[14px] data-[state=active]:${tab.bgColor} data-[state=inactive]:${tab.bgColor}`}
+                      >
+                        {tab.label}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </Tabs>
+
+                {/* Non-member Order Inquiry Section */}
+                <div className="w-[361px] h-[340px]">
+                  <h2 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl text-center tracking-[0] leading-7 whitespace-nowrap mb-[38px]">
+                    비회원 주문조회
+                  </h2>
+
+                  <div className="space-y-[11px] mb-4">
+                    <Input
+                      placeholder="주문자명"
+                      className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#d9d9d9] text-[13px] text-center tracking-[0] leading-[18.2px]"
+                    />
+                    <Input
+                      placeholder="전화번호"
+                      className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#d9d9d9] text-[13px] text-center tracking-[0] leading-[18.2px]"
+                    />
+                  </div>
+
+                  <Button className="absolute bottom-[82px] right-[52px] w-[97px] h-[75px] bg-[url(https://c.animaapp.com/mfexm2mi2gPjcW/img/rectangle-29.svg)] bg-[100%_100%] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] text-center tracking-[0] leading-[21px] h-auto">
+                    확인
+                  </Button>
+
+                  <div className="text-black text-[8px] text-center tracking-[0] leading-[11.2px] mt-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal">
+                    조회 내역이 없습니다.
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
     </div>
   );

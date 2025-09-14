@@ -166,16 +166,15 @@ export const Screen = () => {
   const navigationItems = [
     { name: "로그인", onClick: () => navigate("/login") },
     { name: "회원가입", onClick: () => navigate("/signup") },
-    { name: "장바구니", onClick: () => navigate("/cart") },
-    { name: "마이페이지", onClick: () => navigate("/mypage") },
-    { name: "커뮤니티", onClick: () => navigate("/community") },
+    { name: "장바구니", onClick: () => navigate("/") },
+    { name: "마이페이지", onClick: () => navigate("/") },
+    { name: "커뮤니티", onClick: () => navigate("/") },
   ];
 
   return (
     <div className="bg-white grid justify-items-center [align-items:start] w-screen">
       <div className="bg-white w-[1440px] h-[1216px] relative">
-        {/* 네비게이션 */}
-        <nav className="absolute top-[33px] left-[1080px]">
+        <nav className="absolute top-[33px] left-[1080px] [font-family:'Crimson_Text',Helvetica] font-normal text-black text-[15px] tracking-[0] leading-[21px] whitespace-nowrap">
           <div className="flex gap-4">
             {navigationItems.map((item, index) => (
               <Button
@@ -190,19 +189,29 @@ export const Screen = () => {
           </div>
         </nav>
 
-        {/* 로고 */}
         <header className="absolute w-[146px] h-[118px] top-[135px] left-[649px]">
-          <h1 className="text-center text-[25.5px] font-normal">MY SALON</h1>
-          <p className="text-center text-[9.5px]">당신만을 위한 옷장</p>
-          <img
-            className="absolute w-[66px] h-[66px] top-[52px] left-[37px]"
-            alt="Main icon"
-            src="https://c.animaapp.com/mfeqluynHQoI9d/img/main-icon-1.png"
-          />
+          <div className="relative w-[142px] h-[118px]">
+            <h1 className="absolute w-[142px] top-3 left-0 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[25.5px] text-center tracking-[0] leading-[35.8px] whitespace-nowrap">
+              MY SALON
+            </h1>
+
+            <p className="w-[87px] top-0 left-7 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[9.5px] leading-[13.3px] absolute text-center tracking-[0] whitespace-nowrap">
+              당신만을 위한 옷장
+            </p>
+
+            <img
+              className="absolute w-[66px] h-[66px] top-[52px] left-[37px]"
+              alt="Main icon"
+              src="https://c.animaapp.com/mfeqluynHQoI9d/img/main-icon-1.png"
+            />
+          </div>
         </header>
 
         <main>
-          <h2 className="absolute top-[282px] left-[195px] text-[40px] font-bold">회원가입</h2>
+          <h2 className="top-[282px] left-[195px] [font-family:'SF_Pro-Bold',Helvetica] font-bold text-[#222222] text-[40px] leading-[56px] absolute text-center tracking-[0] whitespace-nowrap">
+            회원가입
+          </h2>
+
           <Separator className="absolute w-[1115px] h-px top-[352px] left-[195px] bg-gray-300" />
 
           {/* 역할 선택 */}
@@ -245,7 +254,6 @@ export const Screen = () => {
             </div>
           </RadioGroup>
 
-          {/* 입력 폼 */}
           <section>
             <h3 className="top-[410px] left-[372px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[35px] leading-[49px] absolute text-center tracking-[0] whitespace-nowrap">
               기본정보
@@ -277,8 +285,6 @@ export const Screen = () => {
             <Input
               id="password"
               type="password"
-              value={formData.password}
-              onChange={handleChange}
               className="top-[554px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
               value={formData.password}
               onChange={handleChange}
@@ -295,8 +301,6 @@ export const Screen = () => {
             <Input
               id="passwordConfirm"
               type="password"
-              value={passwordConfirm}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
               className="top-[612px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
               value={formData.passwordConfirm}
               onChange={handleChange}
@@ -314,8 +318,6 @@ export const Screen = () => {
               <Input
                 id="secondPassword"
                 type="password"
-                value={formData.paymentPassword}
-                onChange={handleChange}
                 placeholder="6자리 숫자로 입력해주세요"
                 className="w-full h-full border-none rounded-none [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-xs leading-[16.8px] text-center tracking-[0]"
                 value={formData.secondPassword}
@@ -393,8 +395,6 @@ export const Screen = () => {
               <Input
                 id="tall"
                 type="number"
-                value={formData.height}
-                onChange={handleChange}
                 className="w-full h-full border-none rounded-none pr-8"
                 value={formData.tall}
                 onChange={handleChange}
@@ -416,8 +416,6 @@ export const Screen = () => {
               <Input
                 id="weight"
                 type="number"
-                value={formData.weight}
-                onChange={handleChange}
                 className="w-full h-full border-none rounded-none pr-8"
                 value={formData.weight}
                 onChange={handleChange}
@@ -460,7 +458,7 @@ export const Screen = () => {
             <Button
               variant="outline"
               className="absolute w-[242px] h-[60px] top-0 left-0 border border-solid border-[#828282] rounded-none bg-white hover:bg-gray-50 h-auto"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/mypage")}
             >
               <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
                 취소
@@ -481,4 +479,3 @@ export const Screen = () => {
     </div>
   );
 };
-

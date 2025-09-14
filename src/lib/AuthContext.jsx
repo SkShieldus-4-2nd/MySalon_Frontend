@@ -3,17 +3,15 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         // 앱 로드 시 localStorage에서 토큰과 사용자 정보 확인
         const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
-        if (storedToken && storedUser) {
+        if (storedToken ) {
             setToken(storedToken);
-            setUser(JSON.parse(storedUser));
+    
         }
         setLoading(false);
     }, []);
@@ -29,11 +27,9 @@ export const AuthProvider = ({ children }) => {
             });
 
             if (response.ok) {
-                const data = await response.json();
-                setToken(data.token);
-                setUser(data.user);
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
+                const token = await response.text();
+                setToken(token);
+                localStorage.setItem('token', token);
                 return { success: true };
             } else {
                 const errorData = await response.json();
@@ -49,7 +45,7 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
         setUser(null);
         localStorage.removeItem('token');
-        localStorage.removeItem('user');
+    
     };
 
     const authFetch = async (url, options = {}) => {
@@ -69,7 +65,7 @@ export const AuthProvider = ({ children }) => {
         return response;
     };
 
-    const value = { user, token, loading, login, logout, authFetch };
+    const value = {token, loading, login, logout, authFetch };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

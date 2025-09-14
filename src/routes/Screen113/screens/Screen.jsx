@@ -17,9 +17,7 @@ export const Screen = () => {
     guestName: "",
     guestPhone: ""
   });
-
-  const [showLoginError, setShowLoginError] = useState(false);
-
+  const [error, setError] = useState("");
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
@@ -36,48 +34,23 @@ export const Screen = () => {
   ];
 
   const handleLogin = async () => {
-
-    if (!loginData.username || !loginData.password) {
-      alert('아이디와 비밀번호를 입력해주세요.');
+    if (!loginData.id || !loginData.password) {
+      setError('아이디와 비밀번호를 입력해주세요.');
       return;
     }
+    setError("");
 
-    try {
-      const response = await fetch('http://localhost:8080/api/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: loginData.username,
-          password: loginData.password,
-        }),
-      });
+    const result = await login(loginData.id, loginData.password);
 
-      if (response.ok) {
-        const token = await response.text();
-        localStorage.setItem('token', token);
-        alert('로그인 성공!');
-        navigate('/mypage');
-        setShowLoginError(false);
-      } else {
-        setShowLoginError(true);
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      alert('로그인 중 오류가 발생했습니다.');
-      setShowLoginError(true);
-
+    if (result.success) {
+      alert('로그인 성공!');
+      navigate('/mypage');
+    } else {
+      setError(result.message || '아이디 또는 비밀번호가 틀렸습니다.');
     }
   };
 
-  const handleGuestOrder = () => {
-    if (!loginData.guestName || !loginData.guestPhone) {
-      alert('주문자명과 전화번호를 입력해주세요.');
-      return;
-    }
-    alert('주문 조회 완료!');
-  };
+
 
   return (
     <div className="bg-white grid justify-items-center [align-items:start] w-screen">
@@ -187,10 +160,8 @@ export const Screen = () => {
                 </Button>
               </div>
 
-
-              <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-red-500 text-[8px] text-center tracking-[0] leading-[11.2px] whitespace-nowrap">
-                {showLoginError && "아이디 또는 비밀번호가 틀렸습니다."}
-
+              <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-red-500 text-[8px] text-center tracking-[0] leading-[11.2px] whitespace-nowrap h-3">
+                {error}
               </div>
             </div>
 
@@ -215,6 +186,8 @@ export const Screen = () => {
                 ))}
               </TabsList>
             </Tabs>
+
+           
           </CardContent>
         </Card>
       </div>
