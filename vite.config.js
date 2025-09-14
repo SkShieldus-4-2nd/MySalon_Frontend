@@ -7,7 +7,15 @@ import { defineConfig } from "vite";
 export default defineConfig(({ mode }) => ({
   plugins: [react(), mode === "development" && screenGraphPlugin()],
   publicDir: "./static",
-  base: "./",
+  base: "/",
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
+  },
   css: {
     postcss: {
       plugins: [tailwind()],

@@ -64,14 +64,17 @@ const ProductRegisterForm = () => {
     removeVariant(index);
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
+    const token = localStorage.getItem("token");
     const userString = localStorage.getItem("user");
-    if (!userString) {
+
+    if (!token || !userString) {
       alert("로그인이 필요합니다.");
       return;
     }
+
     const user = JSON.parse(userString);
     const userNum = user?.userNum;
 
@@ -90,11 +93,11 @@ const ProductRegisterForm = () => {
       productName: form.name,
       price: Number(form.price) || 0,
       deliveryFee: Number(form.shippingFee) || 0,
-      mainImage: form.image ? form.image.name : "placeholder.jpg", // Placeholder for actual upload
+      mainImage: form.image ? form.image.name : "placeholder.jpg",
       description: form.description,
-      gender: "ALL", // Default value, not in form
-      category: "ALL", // Default value, not in form
-      categoryLow: "ALL", // Default value, not in form
+      gender: "ALL",
+      category: "ALL",
+      categoryLow: "ALL",
       productDetails: variants.map(v => ({
         color: v.color,
         size: v.size,
@@ -102,17 +105,30 @@ const ProductRegisterForm = () => {
       }))
     };
 
-    console.log("API 요청 Payload:", payload);
-    alert("API 명세에 따라 요청 데이터를 구성했습니다. 콘솔을 확인해주세요.");
-    
-    // This would be the actual fetch call
-    // const formData = new FormData();
-    // formData.append('productData', new Blob([JSON.stringify(payload)], { type: "application/json" }));
-    // if (form.image) {
-    //   formData.append('imageFile', form.image);
-    // }
-    // fetch('/api/products/create', { method: 'POST', body: formData })
-    //  .then(...)
+    try {
+      const response = await fetch("/api/products/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("상품 등록 성공:", result);
+        alert("상품이 성공적으로 등록되었습니다.");
+        // Optional: Reset form or navigate to product list
+      } else {
+        const errorData = await response.json();
+        console.error("상품 등록 실패:", errorData);
+        alert(`상품 등록에 실패했습니다: ${errorData.message || '서버 오류'}`);
+      }
+    } catch (error) {
+      console.error("API 요청 오류:", error);
+      alert("API 요청 중 오류가 발생했습니다.");
+    }
   };
 
   return (

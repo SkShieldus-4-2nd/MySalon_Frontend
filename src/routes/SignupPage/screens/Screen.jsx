@@ -9,19 +9,58 @@ import { Separator } from "../components/ui/separator";
 export const Screen = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState("buyer"); // buyer | seller
+  const [id, setId] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [secondPassword, setSecondPassword] = useState("");
+  const [userName, setUserName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState("male");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [storeName, setStoreName] = useState("");
 
-  const handleSubmit = () => {
-    // 👉 역할을 로컬스토리지에 저장 (App.jsx 분기와 호환되도록 대문자로 저장)
+  const handleSubmit = async () => {
+    if (password !== passwordConfirm) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
     const role = userType === "seller" ? "SELLER" : "BUYER";
-    localStorage.setItem("role", role);
+    const userData = {
+      id,
+      password,
+      userName,
+      secondPassword,
+      gender: gender.toUpperCase(),
+      tall: height ? parseInt(height, 10) : null,
+      weight: weight ? parseInt(weight, 10) : null,
+      type: role,
+      storeName: userType === "seller" ? storeName : null,
+    };
 
-    // 👉 역할별 목적지로 이동
-    //  - 판매자: /admin-mypage (판매자 탭 화면)
-    //  - 구매자: /shop (일반 쇼핑 홈)
-    const dest = role === "SELLER" ? "/admin-mypage" : "/shop";
+    try {
+      const response = await fetch("/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
 
-    alert("회원가입이 완료되었습니다!");
-    navigate(dest, { replace: true });
+      if (response.ok) {
+        localStorage.setItem("role", role);
+        const dest = role === "SELLER" ? "/admin-mypage" : "/";
+        alert("회원가입이 완료되었습니다!");
+        navigate(dest, { replace: true });
+      } else {
+        const errorData = await response.json();
+        alert(`회원가입 실패: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("회원가입 중 오류가 발생했습니다.");
+    }
   };
 
   const navigationItems = [
@@ -127,6 +166,8 @@ export const Screen = () => {
             <Input
               id="username"
               className="top-[492px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
             />
 
             <div className="absolute top-[553px] left-[462px]">
@@ -141,6 +182,8 @@ export const Screen = () => {
               id="password"
               type="password"
               className="top-[554px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
 
             <div className="absolute top-[613px] left-[441px]">
@@ -155,6 +198,8 @@ export const Screen = () => {
               id="passwordConfirm"
               type="password"
               className="top-[612px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
             />
             <div className="top-[645px] left-[606px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[8px] leading-[11.2px] absolute text-center tracking-[0] whitespace-nowrap">
               비밀번호가 틀렸습니다.
@@ -174,6 +219,8 @@ export const Screen = () => {
                 type="password"
                 placeholder="6자리 숫자로 입력해주세요"
                 className="w-full h-full border-none rounded-none [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-xs leading-[16.8px] text-center tracking-[0]"
+                value={secondPassword}
+                onChange={(e) => setSecondPassword(e.target.value)}
               />
             </div>
 
@@ -188,6 +235,8 @@ export const Screen = () => {
             <Input
               id="name"
               className="top-[734px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
             />
 
             <div className="absolute top-[794px] left-[462px]">
@@ -204,6 +253,8 @@ export const Screen = () => {
                 type="tel"
                 placeholder="- 없이 입력하세요."
                 className="w-full h-full border-none rounded-none [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#999999] text-[10px] leading-[14px] text-center tracking-[0]"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
             </div>
 
@@ -214,7 +265,8 @@ export const Screen = () => {
             </div>
             <RadioGroup
               className="absolute w-[184px] h-[22px] top-[859px] left-[606px]"
-              defaultValue="male"
+              value={gender}
+              onValueChange={setGender}
             >
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center space-x-3">
@@ -259,6 +311,8 @@ export const Screen = () => {
                 id="height"
                 type="number"
                 className="w-full h-full border-none rounded-none pr-8"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
               />
               <div className="absolute top-1 right-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px] whitespace-nowrap">
                 cm
@@ -278,6 +332,8 @@ export const Screen = () => {
                 id="weight"
                 type="number"
                 className="w-full h-full border-none rounded-none pr-8"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
               />
               <div className="absolute top-1 right-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px] whitespace-nowrap">
                 kg
@@ -303,6 +359,8 @@ export const Screen = () => {
                     ? "border-[#828282] bg-white"
                     : "border-[#d0d0d0] bg-[#f5f5f5] text-[#999999] cursor-not-allowed"
                 }`}
+                value={storeName}
+                onChange={(e) => setStoreName(e.target.value)}
               />
             </div>
           </section>
