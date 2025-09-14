@@ -17,7 +17,9 @@ export const Screen = () => {
     guestName: "",
     guestPhone: ""
   });
+
   const [showLoginError, setShowLoginError] = useState(false);
+
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
@@ -34,6 +36,7 @@ export const Screen = () => {
   ];
 
   const handleLogin = async () => {
+
     if (!loginData.username || !loginData.password) {
       alert('아이디와 비밀번호를 입력해주세요.');
       return;
@@ -64,6 +67,7 @@ export const Screen = () => {
       console.error('Login failed:', error);
       alert('로그인 중 오류가 발생했습니다.');
       setShowLoginError(true);
+
     }
   };
 
@@ -183,8 +187,10 @@ export const Screen = () => {
                 </Button>
               </div>
 
+
               <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-red-500 text-[8px] text-center tracking-[0] leading-[11.2px] whitespace-nowrap">
                 {showLoginError && "아이디 또는 비밀번호가 틀렸습니다."}
+
               </div>
             </div>
 
