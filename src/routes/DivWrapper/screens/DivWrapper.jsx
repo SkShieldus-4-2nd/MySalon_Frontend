@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { SearchIcon } from "lucide-react";
+import { useAuth } from "../../../lib/AuthContext";
 
 // shadcn/ui (라우트 폴더 내부의 components 경로 그대로 사용)
 import { Button } from "../components/ui/button";
@@ -10,6 +11,31 @@ import { Separator } from "../components/ui/separator";
 
 export const DivWrapper = () => {
   const navigate = useNavigate();
+  const { authFetch } = useAuth();
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const response = await authFetch('http://localhost:8080/api/posts');
+        if (response.ok) {
+          const data = await response.json();
+          setPosts(data);
+        } else {
+          throw new Error('게시물을 불러오는데 실패했습니다.');
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [authFetch]);
 
   // 상단 네비 (우측)
   const navigationLinks = [
@@ -18,14 +44,6 @@ export const DivWrapper = () => {
     { label: "장바구니", to: "/cart" },
     { label: "마이페이지", to: "/mypage" },
     { label: "커뮤니티", to: "/community" },
-  ];
-
-  // 게시판 더미 데이터
-  const posts = [
-    { id: 1, title: "이 옷에 어울리는 바지 추천해주세요!", author: "홍길동", ago: "1시간 전", comments: 1, hasImage: true },
-    { id: 2, title: "이 옷에 어울리는 바지 추천해주세요!", author: "홍길동", ago: "1시간 전", comments: 3, hasImage: false },
-    { id: 3, title: "이 옷에 어울리는 바지 추천해주세요!", author: "홍길동", ago: "1시간 전", comments: 2, hasImage: false },
-    { id: 4, title: "이 옷에 어울리는 바지 추천해주세요!", author: "홍길동", ago: "1시간 전", comments: 1, hasImage: false },
   ];
 
   return (
@@ -98,7 +116,7 @@ export const DivWrapper = () => {
             <Button
               variant="outline"
               className="h-10 px-4 border border-[#999] text-[12px]"
-              onClick={() => navigate("/board/write")}  // ← 여기만 바뀜!
+              onClick={() => navigate("/board/write")}
             >
               글쓰기
             </Button>
@@ -107,28 +125,34 @@ export const DivWrapper = () => {
           {/* 리스트 카드 */}
           <Card className="rounded-[8px] border border-black/30">
             <CardContent className="p-0">
-              {posts.map((post, idx) => (
-                <div key={post.id}>
+              {loading && <div className="p-6 text-center">게시물을 불러오는 중...</div>}
+              {error && <div className="p-6 text-center text-red-500">{error}</div>}
+              {!loading && !error && posts.map((post, idx) => (
+                <div key={post.id || idx}>
                   <div className="flex items-stretch px-6 py-5">
                     {/* 왼쪽 컨텐츠 */}
                     <div className="flex-1 pr-6">
                       <button
                         className="text-[16px] font-semibold text-left hover:underline"
-                        onClick={() => navigate(`/post/${post.id}`)}
+                        onClick={() => navigate(`/post/${post.id}`)} // Assuming post has an id for navigation
                       >
                         {post.title}
                       </button>
 
                       <div className="mt-2 text-[12px] text-[#666] flex items-center gap-3">
-                        <span>{post.author}</span>
-                        <span>{post.ago}</span>
-                        <span>댓글 {post.comments}개</span>
+                        <span>{post.writer}</span>
+                        <span>{new Date(post.writingDate).toLocaleDateString()}</span>
+                        <span>댓글 {post.commentCount}개</span>
                       </div>
                     </div>
 
-                    {/* 우측 사진 자리 */}
+                    {/* 우측 사진 */}
                     <div className="w-[64px] h-[64px] border border-[#ccc] bg-[#f5f5f5] flex items-center justify-center text-[12px] text-[#444] shrink-0">
-                      {post.hasImage ? "사진" : " "}
+                      {post.image ? (
+                        <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+                      ) : (
+                        " "
+                      )}
                     </div>
                   </div>
 
