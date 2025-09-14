@@ -5,7 +5,7 @@
 * 로그인 페이지: src/routes/Screen113/screens/Screen.jsx
 * 회원가입 페이지: src/routes/SignupPage/screens/Screen.jsx
 * 회원가입 완료페이지: src/routes/Screen120/screens/Screen.jsx
-* 상품 상세(구매하기 버튼 있는 화면)페이지: src/routes/Screen101/screens/Screen.jsx
+* 상품 상세(구매하기 버튼 있는 화면)페이지: src/routes/Screen120/screens/Screen.jsx
 * 상품 상세 – 수정하기 버튼 버전 페이지:  src/routes/Screen120/screens/Screen.jsx
 * 상품 상세 – 삭제하기 버튼 버전 페이지: src/routes/Screen126/screens/Screen.jsx
 * 주문 완료(“주문이 완료됐습니다”)페이지:  src/routes/Screen133/screens/Screen.jsx
