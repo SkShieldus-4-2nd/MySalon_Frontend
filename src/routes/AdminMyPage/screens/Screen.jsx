@@ -88,46 +88,94 @@ const ProductRegisterForm = () => {
       return;
     }
 
-    const payload = {
-      userNum: userNum,
-      productName: form.name,
-      price: Number(form.price) || 0,
-      deliveryFee: Number(form.shippingFee) || 0,
-      mainImage: form.image ? form.image.name : "placeholder.jpg",
-      description: form.description,
-      gender: "ALL",
-      category: "ALL",
-      categoryLow: "ALL",
-      productDetails: variants.map(v => ({
+    // 이미지가 있는 경우 FormData 사용, 없는 경우 JSON 사용
+    if (form.image) {
+      const formData = new FormData();
+      formData.append('userNum', userNum);
+      formData.append('productName', form.name);
+      formData.append('price', Number(form.price) || 0);
+      formData.append('delivery_price', Number(form.shippingFee) || 0);
+      formData.append('mainImage', form.image);
+      formData.append('description', form.description);
+      formData.append('gender', '');
+      formData.append('category', '');
+      formData.append('categoryLow', '');
+      formData.append('productDetails', JSON.stringify(variants.map(v => ({
         color: v.color,
         size: v.size,
         count: v.maxQty
-      }))
-    };
+      }))));
 
-    try {
-      const response = await fetch("/api/products/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      try {
+        const response = await fetch("http://localhost:8080/api/products/create-with-image", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+          body: formData,
+        });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log("상품 등록 성공:", result);
-        alert("상품이 성공적으로 등록되었습니다.");
-        // Optional: Reset form or navigate to product list
-      } else {
-        const errorData = await response.json();
-        console.error("상품 등록 실패:", errorData);
-        alert(`상품 등록에 실패했습니다: ${errorData.message || '서버 오류'}`);
+        if (response.ok) {
+          const result = await response.json();
+          console.log("상품 등록 성공:", result);
+          alert("상품이 성공적으로 등록되었습니다.");
+          // 폼 리셋
+          setForm({ name: "", description: "", price: "", shippingFee: "", image: null });
+          setVariants([]);
+        } else {
+          const errorData = await response.json();
+          console.error("상품 등록 실패:", errorData);
+          alert(`상품 등록에 실패했습니다: ${errorData.message || '서버 오류'}`);
+        }
+      } catch (error) {
+        console.error("API 요청 오류:", error);
+        alert("API 요청 중 오류가 발생했습니다.");
       }
-    } catch (error) {
-      console.error("API 요청 오류:", error);
-      alert("API 요청 중 오류가 발생했습니다.");
+    } else {
+      // 이미지가 없는 경우 JSON으로 전송
+      const payload = {
+        userNum: userNum,
+        productName: form.name,
+        price: Number(form.price) || 0,
+        delivery_price: Number(form.shippingFee) || 0,
+        mainImage: null,
+        description: form.description,
+        gender: null,
+        category: null,
+        categoryLow: null,
+        productDetails: variants.map(v => ({
+          color: v.color,
+          size: v.size,
+          count: v.maxQty
+        }))
+      };
+
+      try {
+        const response = await fetch("http://localhost:8080/api/products/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("상품 등록 성공:", result);
+          alert("상품이 성공적으로 등록되었습니다.");
+          // 폼 리셋
+          setForm({ name: "", description: "", price: "", shippingFee: "", image: null });
+          setVariants([]);
+        } else {
+          const errorData = await response.json();
+          console.error("상품 등록 실패:", errorData);
+          alert(`상품 등록에 실패했습니다: ${errorData.message || '서버 오류'}`);
+        }
+      } catch (error) {
+        console.error("API 요청 오류:", error);
+        alert("API 요청 중 오류가 발생했습니다.");
+      }
     }
   };
 
