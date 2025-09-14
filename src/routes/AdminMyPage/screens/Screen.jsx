@@ -9,7 +9,7 @@ import { Input } from "../components/ui/input";
 /** ================================
  *  상품 등록 폼 (최대수량 '추가하기' 포함, JS 버전)
  *  ================================= */
-const ProductRegisterForm = () => {
+const ProductRegisterForm = ({ onProductCreated }) => {
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -122,6 +122,10 @@ const ProductRegisterForm = () => {
           // 폼 리셋
           setForm({ name: "", description: "", price: "", shippingFee: "", image: null });
           setVariants([]);
+          // 상품 목록 새로고침
+          if (onProductCreated) {
+            onProductCreated();
+          }
         } else {
           const errorData = await response.json();
           console.error("상품 등록 실패:", errorData);
@@ -167,6 +171,10 @@ const ProductRegisterForm = () => {
           // 폼 리셋
           setForm({ name: "", description: "", price: "", shippingFee: "", image: null });
           setVariants([]);
+          // 상품 목록 새로고침
+          if (onProductCreated) {
+            onProductCreated();
+          }
         } else {
           const errorData = await response.json();
           console.error("상품 등록 실패:", errorData);
@@ -301,6 +309,89 @@ const ProductRegisterForm = () => {
 export const Screen = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("product-list");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // 로그인한 사용자의 상품 목록 가져오기
+  const fetchUserProducts = async () => {
+    const token = localStorage.getItem("token");
+    const userString = localStorage.getItem("user");
+
+    if (!token || !userString) {
+      console.log("로그인이 필요합니다.");
+      return;
+    }
+
+    const user = JSON.parse(userString);
+    const userNum = user?.userNum;
+
+    if (!userNum) {
+      console.log("사용자 정보를 가져올 수 없습니다.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8080/api/products?userNum=${userNum}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data);
+      } else {
+        console.error("상품 목록 조회 실패");
+      }
+    } catch (error) {
+      console.error("API 요청 오류:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 상품 목록 가져오기
+  React.useEffect(() => {
+    if (activeTab === "product-list") {
+      fetchUserProducts();
+    }
+  }, [activeTab]);
+
+  // 상품 등록 후 목록 새로고침
+  const refreshProductList = () => {
+    if (activeTab === "product-list") {
+      fetchUserProducts();
+    }
+  };
+
+  // 상품 삭제
+  const deleteProduct = async (productId) => {
+    if (!confirm("정말로 이 상품을 삭제하시겠습니까?")) {
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`http://localhost:8080/api/products/${productId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        alert("상품이 삭제되었습니다.");
+        fetchUserProducts(); // 목록 새로고침
+      } else {
+        alert("상품 삭제에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("상품 삭제 오류:", error);
+      alert("상품 삭제 중 오류가 발생했습니다.");
+    }
+  };
 
   // 상세(판매자용) 페이지로 이동
   const goToDetail = (product) => {
@@ -315,42 +406,6 @@ export const Screen = () => {
     { id: "sales", label: "매출", active: false },
   ];
 
-  const products = [
-    {
-      id: "123456789",
-      name: "여름블루 롱 원피스",
-      description:
-        "여름에 입기 좋은 롱 원피스.. 상품 설명 상품 설명 상품 설명 상품 설명 상품 설명 상품 설명",
-      price: "50,000 원",
-      image: "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png",
-      shipping: "3,000원",
-      colors: ["Black", "White", "Red"],
-      sizes: ["S", "M", "L"],
-      qty: 2,
-    },
-    {
-      id: "987654321",
-      name: "썸머 스트라이프 드레스",
-      description: "시원한 스트라이프 패턴의 여름 원피스. 상품 설명 상품 설명 상품 설명",
-      price: "59,000 원",
-      image: "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png",
-      shipping: "3,000원",
-      colors: ["Black", "White"],
-      sizes: ["S", "M"],
-      qty: 1,
-    },
-    {
-      id: "555222333",
-      name: "플로럴 롱 원피스",
-      description: "잔잔한 플로럴 패턴이 포인트. 상품 설명 상품 설명 상품 설명",
-      price: "62,000 원",
-      image: "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png",
-      shipping: "3,500원",
-      colors: ["Blue", "White"],
-      sizes: ["M", "L"],
-      qty: 3,
-    },
-  ];
 
   const topNavItems = [
     { name: "로그인", onClick: () => navigate("/login") },
@@ -448,63 +503,76 @@ export const Screen = () => {
                 상품 목록
               </h1>
 
-              <div className="space-y-[41px]">
-                {products.map((product) => (
-                  <Card key={product.id} className="border-0 shadow-none">
-                    <CardContent className="p-0">
-                      <div className="flex items-start gap-[62px]">
-                        {/* 이미지 클릭 시 상세로 */}
-                        <img
-                          className="w-[119px] h-[159px] object-cover flex-shrink-0 cursor-pointer"
-                          alt="Product image"
-                          src={product.image}
-                          onClick={() => goToDetail(product)}
-                        />
+              {loading ? (
+                <div className="text-center py-8">
+                  <p className="text-[#828282]">상품 목록을 불러오는 중...</p>
+                </div>
+              ) : products.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-[#828282]">등록된 상품이 없습니다.</p>
+                </div>
+              ) : (
+                <div className="space-y-[41px]">
+                  {products.map((product) => (
+                    <Card key={product.productNum} className="border-0 shadow-none">
+                      <CardContent className="p-0">
+                        <div className="flex items-start gap-[62px]">
+                          {/* 이미지 클릭 시 상세로 */}
+                          <img
+                            className="w-[119px] h-[159px] object-cover flex-shrink-0 cursor-pointer"
+                            alt="Product image"
+                            src={product.mainImage && product.mainImage !== "default.jpg" ? `http://localhost:8080${product.mainImage}` : "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png"}
+                            onClick={() => goToDetail(product)}
+                          />
 
-                        <div className="flex-1">
-                          <div className="mb-[7px] text-[#828282] text-xs leading-[16.8px]">
-                            {product.id}
+                          <div className="flex-1">
+                            <div className="mb-[7px] text-[#828282] text-xs leading-[16.8px]">
+                              {product.productNum}
+                            </div>
+
+                            {/* 이름 클릭 시 상세로 */}
+                            <h3
+                              className="mb-[10px] text-black text-xl text-center leading-7 cursor-pointer hover:underline"
+                              onClick={() => goToDetail(product)}
+                            >
+                              {product.productName}
+                            </h3>
+
+                            <p className="mb-[21px] text-black text-[17px] leading-[23.8px] whitespace-pre-line">
+                              {product.description}
+                            </p>
+
+                            <div className="text-black text-[23px] text-center leading-[32.2px]">
+                              {product.price?.toLocaleString()} 원
+                            </div>
                           </div>
 
-                          {/* 이름 클릭 시 상세로 */}
-                          <h3
-                            className="mb-[10px] text-black text-xl text-center leading-7 cursor-pointer hover:underline"
-                            onClick={() => goToDetail(product)}
-                          >
-                            {product.name}
-                          </h3>
+                          <div className="flex flex-col gap-[16px] mt-[35px]">
+                            <Button
+                              variant="outline"
+                              className="w-[105px] h-9 border-[0.91px] border-black bg-transparent hover:bg-gray-50 rounded-none"
+                              onClick={() => goToDetail(product)}
+                            >
+                              <span className="text-black text-[15.4px] leading-[21.6px]">
+                                상품페이지
+                              </span>
+                            </Button>
 
-                          <p className="mb-[21px] text-black text-[17px] leading-[23.8px] whitespace-pre-line">
-                            {product.description}
-                          </p>
-
-                          <div className="text-black text-[23px] text-center leading-[32.2px]">
-                            {product.price}
+                            <Button 
+                              className="w-[105px] h-9 bg-[#828282] hover:bg-[#707070] rounded-none"
+                              onClick={() => deleteProduct(product.productNum)}
+                            >
+                              <span className="text-white text-[15.4px] leading-[21.6px]">
+                                삭제
+                              </span>
+                            </Button>
                           </div>
                         </div>
-
-                        <div className="flex flex-col gap-[16px] mt-[35px]">
-                          <Button
-                            variant="outline"
-                            className="w-[105px] h-9 border-[0.91px] border-black bg-transparent hover:bg-gray-50 rounded-none"
-                            onClick={() => goToDetail(product)}
-                          >
-                            <span className="text-black text-[15.4px] leading-[21.6px]">
-                              상품페이지
-                            </span>
-                          </Button>
-
-                          <Button className="w-[105px] h-9 bg-[#828282] hover:bg-[#707070] rounded-none">
-                            <span className="text-white text-[15.4px] leading-[21.6px]">
-                              삭제
-                            </span>
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </>
           )}
 
@@ -514,7 +582,7 @@ export const Screen = () => {
               <h1 className="mb-8 font-bold text-black text-[27px] leading-[37.8px]">
                 상품 등록
               </h1>
-              <ProductRegisterForm />
+              <ProductRegisterForm onProductCreated={refreshProductList} />
             </>
           )}
 
