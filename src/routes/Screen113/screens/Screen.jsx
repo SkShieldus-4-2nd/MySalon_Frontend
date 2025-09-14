@@ -1,7 +1,6 @@
 import { MenuIcon, SearchIcon } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -16,17 +15,6 @@ export const Screen = () => {
     guestName: "",
     guestPhone: ""
   });
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
-      if (user.type === "SELLER") {
-        navigate("/admin-mypage");
-      } else {
-        navigate("/mypage");
-      }
-    }
-  }, [navigate]);
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
@@ -49,26 +37,35 @@ export const Screen = () => {
     }
 
     try {
-      const response = await axios.post("/api/users/login", {
-        id: loginData.username,
-        password: loginData.password,
+      const response = await fetch("http://localhost:8080/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: loginData.username,
+          password: loginData.password,
+        }),
       });
 
-      const { token, user } = response.data;
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-
-      if (user.type === "SELLER") {
-        alert("판매자로 로그인하였습니다.");
-        navigate("/admin-mypage");
-      } else {
         alert("로그인 성공!");
-        navigate("/mypage");
+
+        if (data.user.type === "SELLER") {
+          navigate("/admin-mypage");
+        } else {
+          navigate("/mypage");
+        }
+      } else {
+        alert("아이디 또는 비밀번호가 틀렸습니다.");
       }
     } catch (error) {
       console.error("Login failed:", error);
-      alert("아이디 또는 비밀번호가 틀렸습니다.");
+      alert("로그인 중 오류가 발생했습니다.");
     }
   };
 

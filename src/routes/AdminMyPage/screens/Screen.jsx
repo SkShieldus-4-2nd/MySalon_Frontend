@@ -309,11 +309,7 @@ export const Screen = () => {
                 key={item.id}
                 variant="ghost"
                 onClick={() => setActiveTab(item.id)}
-                className={`h-auto p-0 text-2xl leading-[20.7px] transition-all ${
-                  activeTab === item.id
-                    ? "font-bold text-[#a40303]"
-                    : "font-normal text-black hover:text-[#a40303]"
-                }`}
+                className={`h-auto p-0 text-2xl leading-[20.7px] transition-all ${activeTab === item.id ? "font-bold text-[#a40303]" : "font-normal text-black hover:text-[#a40303]"}`}
               >
                 {item.label}
               </Button>

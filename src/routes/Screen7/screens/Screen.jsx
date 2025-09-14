@@ -221,10 +221,8 @@ export const Screen = () => {
             ))}
           </div>
 
-          <Button className="w-[88px] h-7 bg-[url(https://c.animaapp.com/mfdr02ygUxSPCb/img/rectangle-28.svg)] bg-[100%_100%] border-0 hover:opacity-80">
-            <span className="[font-family:'DM_Serif_Text',Helvetica] font-normal text-white text-[15px] tracking-[0] leading-[21px]">
-              더보기
-            </span>
+          <Button className="w-[88px] h-7 bg-[url(https://c.animaapp.com/mfen0m06YlmqEB/img/rectangle-28.svg)] bg-cover border-0 text-white [font-family:'DM_Serif_Text',Helvetica] font-normal text-[15px] h-auto">
+            더보기
           </Button>
         </section>
 

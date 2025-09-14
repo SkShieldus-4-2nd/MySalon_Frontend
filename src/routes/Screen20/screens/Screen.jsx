@@ -1,22 +1,13 @@
 import { MenuIcon, MicIcon, SearchIcon } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuContent,
-} from "../components/ui/navigation-menu";
 
 export const Screen = () => {
   const navigate = useNavigate();
-  const [isNavOpen, setIsNavOpen] = useState(false);
 
   const topNavItems = [
     "로그인",
@@ -27,83 +18,49 @@ export const Screen = () => {
   ];
 
   const mainNavItems = [
-    { 
-      name: "상의", 
-      active: true,
-      subItems: ["티셔츠", "셔츠", "니트", "후드티", "맨투맨"]
-    },
-    { 
-      name: "아우터", 
-      active: false,
-      subItems: ["자켓", "코트", "패딩", "가디건", "블레이저"]
-    },
-    { 
-      name: "바지", 
-      active: false,
-      subItems: ["청바지", "슬랙스", "조거팬츠", "반바지", "레깅스"]
-    },
-    { 
-      name: "원피스/스커트", 
-      active: false,
-      subItems: ["원피스", "미니스커트", "롱스커트", "플리츠스커트"]
-    },
-    { 
-      name: "ACC/BAG", 
-      active: false,
-      subItems: ["가방", "지갑", "벨트", "모자", "액세서리"]
-    },
-    { 
-      name: "홈웨어/속옷", 
-      active: false,
-      subItems: ["파자마", "속옷", "양말", "홈웨어"]
-    },
-    { 
-      name: "키즈", 
-      active: false,
-      subItems: ["아동복", "유아복", "신발", "액세서리"]
-    },
-    { 
-      name: "문의", 
-      active: false,
-      subItems: ["고객센터", "FAQ", "1:1문의", "교환/반품"]
-    },
+    { name: "상의", active: true },
+    { name: "아우터", active: false },
+    { name: "바지", active: false },
+    { name: "원피스/스커트", active: false },
+    { name: "ACC/BAG", active: false },
+    { name: "홈웨어/속옷", active: false },
+    { name: "키즈", active: false },
+    { name: "문의", active: false },
   ];
 
-  const categoryItems = [
-    { name: "상의" },
-    { name: "팬츠" },
-    { name: "남성" },
-    { name: "여성" },
-    { name: "키즈" },
-  ];
+  const categoryItems = ["상의", "팬츠", "남성", "여성", "키즈"];
 
-  const productItems = [
+  const products = [
     {
+      id: 1,
       image:
-        "https://c.animaapp.com/mfen0m06YlmqEB/img/maneking-gwa-osgage-5.png",
-      name: "상품 이름 (판매자가 지정하는 이름)",
+        "https://c.animaapp.com/mfdr02ygUxSPCb/img/maneking-gwa-osgage-5.png",
       category: "MALE",
+      name: "상품 이름 (판매자가 지정하는 이름)",
       price: "50,000원",
     },
     {
+      id: 2,
       image:
-        "https://c.animaapp.com/mfen0m06YlmqEB/img/maneking-gwa-osgage-6.png",
-      name: "상품 이름 (판매자가 지정하는 이름)",
+        "https://c.animaapp.com/mfdr02ygUxSPCb/img/maneking-gwa-osgage-6.png",
       category: "MALE",
+      name: "상품 이름 (판매자가 지정하는 이름)",
       price: "50,000원",
     },
     {
+      id: 3,
       image:
-        "https://c.animaapp.com/mfen0m06YlmqEB/img/maneking-gwa-osgage-7.png",
-      name: "상품 이름 (판매자가 지정하는 이름)",
+        "https://c.animaapp.com/mfdr02ygUxSPCb/img/maneking-gwa-osgage-7.png",
       category: "MALE",
+      name: "상품 이름 (판매자가 지정하는 이름)",
       price: "50,000원",
     },
     {
+      id: 4,
       image:
-        "https://c.animaapp.com/mfen0m06YlmqEB/img/maneking-gwa-osgage-8.png",
-      name: "상품 이름 (판매자가 지정하는 이름)",
+        "https://c.animaapp.com/mfdr02ygUxSPCb/img/maneking-gwa-osgage-8.png",
       category: "MALE",
+      name: "상품 이름 (판매자가 지정하는 이름)",
       price: "50,000원",
     },
   ];
@@ -116,12 +73,22 @@ export const Screen = () => {
           <img
             className="w-full h-[271px] object-cover"
             alt="Rectangle"
-            src="https://c.animaapp.com/mfen0m06YlmqEB/img/rectangle-33.svg"
+            src="https://c.animaapp.com/mfdr02ygUxSPCb/img/rectangle-33.svg"
           />
+
+          {/* Hamburger MenuIcon */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-[15px] left-[25px] w-[58px] h-[58px] bg-neutral-100 rounded-full hover:bg-neutral-200"
+            onClick={() => navigate('/menu')}
+          >
+            <MenuIcon className="w-6 h-6" />
+          </Button>
 
           {/* Top Navigation */}
           <nav className="absolute top-[33px] right-[80px]">
-            <div className="flex gap-4 [font-family:'Crimson_Text',Helvetica] font-normal text-black text-[15px]">
+            <div className="flex items-center gap-4 [font-family:'Crimson_Text',Helvetica] font-normal text-black text-[15px]">
               {topNavItems.map((item, index) => (
                 <Button
                   key={index}
@@ -147,15 +114,6 @@ export const Screen = () => {
             </div>
           </nav>
 
-          {/* Hamburger MenuIcon */}
-          <Button
-            variant="ghost"
-            className="absolute top-[15px] left-[25px] w-[58px] h-[58px] bg-neutral-100 rounded-full p-0"
-            onClick={() => navigate('/menu')}
-          >
-            <MenuIcon className="w-6 h-6" />
-          </Button>
-
           {/* Logo Section */}
           <div className="absolute top-[75px] left-1/2 transform -translate-x-1/2 text-center">
             <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[11.1px] mb-3">
@@ -167,40 +125,26 @@ export const Screen = () => {
             <img
               className="w-[67px] h-[66px] mx-auto"
               alt="Main icon"
-              src="https://c.animaapp.com/mfen0m06YlmqEB/img/main-icon-1.png"
+              src="https://c.animaapp.com/mfdr02ygUxSPCb/img/main-icon-1.png"
             />
           </div>
 
-          {/* Main Navigation with Dropdown */}
-          <NavigationMenu className="absolute top-[215px] left-[292px]">
-            <NavigationMenuList className="flex gap-8">
+          {/* Main Navigation */}
+          <nav className="absolute top-[215px] left-0 right-0">
+            <div className="flex items-center justify-center gap-8">
               {mainNavItems.map((item, index) => (
-                <NavigationMenuItem key={index}>
-                  <NavigationMenuTrigger
-                    className={`[font-family:'SF_Pro-Bold',Helvetica] font-bold text-[27.6px] tracking-[-0.08px] leading-[20.7px] ${
-                      item.active ? "text-[#a40202]" : "text-black"
-                    } hover:text-[#a40202] transition-colors bg-transparent hover:bg-transparent data-[state=open]:bg-transparent`}
-                  >
-                    {item.name}
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="w-[200px] p-4 bg-white rounded-lg shadow-lg border">
-                      <div className="grid gap-2">
-                        {item.subItems?.map((subItem, subIndex) => (
-                          <NavigationMenuLink
-                            key={subIndex}
-                            className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer"
-                          >
-                            {subItem}
-                          </NavigationMenuLink>
-                        ))}
-                      </div>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
+                <Button
+                  key={index}
+                  variant="ghost"
+                  className={`h-auto p-0 [font-family:'SF_Pro-Bold',Helvetica] font-bold text-[27.6px] tracking-[-0.08px] leading-[20.7px] ${
+                    item.active ? "text-[#a40202]" : "text-black"
+                  }`}
+                >
+                  {item.name}
+                </Button>
               ))}
-            </NavigationMenuList>
-          </NavigationMenu>
+            </div>
+          </nav>
 
           {/* SearchIcon Bar */}
           <div className="absolute top-[260px] left-1/2 transform -translate-x-1/2 w-[614px]">
@@ -208,7 +152,7 @@ export const Screen = () => {
               <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#999999]" />
               <Input
                 placeholder="Search"
-                className="w-full h-[110px] pl-12 pr-12 bg-[#78788029] border-0 rounded-full text-[17px] placeholder:text-[#999999]"
+                className="w-full h-[110px] pl-12 pr-12 bg-[#78788029] border-0 rounded-full text-[17px] [font-family:'SF_Pro-Regular',Helvetica] placeholder:text-[#999999]"
               />
               <MicIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#999999]" />
             </div>
@@ -216,62 +160,59 @@ export const Screen = () => {
         </header>
 
         {/* Shop By My Salon Section */}
-        <section className="mt-8 text-center">
-          <h2 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl tracking-[-0.08px] leading-[22px] mb-8">
+        <section className="mt-[11px] text-center">
+          <h2 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl tracking-[-0.08px] leading-[22px] mb-[77px]">
             SHOP BY MY SALON
           </h2>
 
-          <div className="flex justify-center gap-[73px] mb-8">
-            {categoryItems.map((_, index) => (
-              <div
-                key={index}
-                className="w-[78px] h-[71px] bg-[#d9d9d9] rounded-full"
-              />
-            ))}
-          </div>
-
-          <div className="flex justify-center gap-[73px]">
+          <div className="flex items-center justify-center gap-[73px] mb-[91px]">
             {categoryItems.map((category, index) => (
-              <div
-                key={index}
-                className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl tracking-[-0.08px] leading-[22px]"
-              >
-                {category.name}
+              <div key={index} className="text-center">
+                <Button
+                  variant="ghost"
+                  className="w-[78px] h-[71px] bg-[#d9d9d9] rounded-full hover:bg-[#c9c9c9] mb-4"
+                />
+                <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl tracking-[-0.08px] leading-[22px]">
+                  {category}
+                </div>
               </div>
             ))}
           </div>
         </section>
 
         {/* Recommended Products Section */}
-        <section className="mt-16">
-          <h2 className="text-center [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl tracking-[-0.08px] leading-[22px] mb-8">
+        <section className="text-center mb-[103px]">
+          <h2 className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl tracking-[-0.08px] leading-[22px] mb-[67px]">
             당신을 위한 추천상품
           </h2>
 
-          <div className="grid grid-cols-4 gap-8 px-[134px]">
-            {productItems.map((product, index) => (
-              <Card key={index} className="bg-white border-0 shadow-none">
+          <div className="flex justify-center gap-[91px] mb-[57px]">
+            {products.map((product) => (
+              <Card
+                key={product.id}
+                className="w-[232px] bg-transparent border-0 shadow-none"
+              >
                 <CardContent className="p-0">
-                  <div className="relative">
-                    <div className="w-full h-[273px] bg-white mb-4" />
+                  <div className="relative mb-4">
+                    <div className="w-[231px] h-[273px] bg-white absolute top-[38px] left-0" />
                     <img
-                      className="absolute top-0 left-0 w-full h-[348px] object-cover"
+                      className="w-[232px] h-[348px] relative z-10"
                       alt="Maneking gwa osgage"
                       src={product.image}
                     />
                   </div>
 
-                  <div className="mt-4">
+                  <div className="text-left">
                     <Badge
                       variant="secondary"
-                      className="text-[8px] text-[#828282] mb-2 bg-transparent border-0 p-0"
+                      className="mb-2 text-[8px] [font-family:'Crimson_Text',Helvetica] font-normal text-[#828282] bg-transparent border-0 p-0"
                     >
                       {product.category}
                     </Badge>
-                    <h3 className="[font-family:'Galdeano',Helvetica] font-normal text-black text-[15px] mb-2">
+                    <h3 className="[font-family:'Galdeano',Helvetica] font-normal text-black text-[15px] tracking-[0] leading-[21px] mb-2">
                       {product.name}
                     </h3>
-                    <p className="[font-family:'DM_Serif_Text',Helvetica] font-normal text-black text-[15px]">
+                    <p className="[font-family:'DM_Serif_Text',Helvetica] font-normal text-[15px] tracking-[0] leading-[21px] text-black">
                       {product.price}
                     </p>
                   </div>
@@ -280,16 +221,14 @@ export const Screen = () => {
             ))}
           </div>
 
-          <div className="text-center mt-8">
-            <Button className="w-[88px] h-7 bg-[url(https://c.animaapp.com/mfen0m06YlmqEB/img/rectangle-28.svg)] bg-cover border-0 text-white [font-family:'DM_Serif_Text',Helvetica] font-normal text-[15px] h-auto">
-              더보기
-            </Button>
-          </div>
+          <Button className="w-[88px] h-7 bg-[url(https://c.animaapp.com/mfen0m06YlmqEB/img/rectangle-28.svg)] bg-cover border-0 text-white [font-family:'DM_Serif_Text',Helvetica] font-normal text-[15px] h-auto">
+            더보기
+          </Button>
         </section>
 
         {/* Footer */}
-        <footer className="mt-16 text-center px-8">
-          <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] leading-[21px]">
+        <footer className="text-center pb-8">
+          <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px]">
             My Salon
             <br />
             상호명: SK쉴더스 주식회사 | 대표이사: 5조 <br />

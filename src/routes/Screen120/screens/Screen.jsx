@@ -151,9 +151,7 @@ export const Screen = () => {
                     <Button
                       key={c}
                       variant={c === color ? "default" : "outline"}
-                      className={`h-7 px-3 rounded-none ${
-                        c === color ? "bg-[#444] hover:bg-[#333]" : ""
-                      }`}
+                      className={`h-7 px-3 rounded-none ${c === color ? "bg-[#444] hover:bg-[#333]" : ""}`}
                       onClick={() => setColor(c)}
                     >
                       {c}
@@ -169,11 +167,12 @@ export const Screen = () => {
                   onChange={(e) => setSize(e.target.value)}
                   className="border border-[#c9c9c9] h-8 px-2"
                 >
-                  {(product.sizes ?? ["S", "M", "L"]).map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
+                  {(product.sizes ?? ["S", "M", "L"])
+                    .map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
                 </select>
               </div>
 

@@ -58,7 +58,7 @@ export const Screen = () => {
       category: "휴양지룩",
       image: "https://c.animaapp.com/mfezbbicpZVDGC/img/image-1-4.png",
       avatar:
-        "https://c.animaapp.com/mfezbbicpZVDGC/img/chatgpt-image-2025--9--7-----04-10-17-1.png",
+        "https://c.animaapp.com/mfezbbicpZVDGC/img/chatgpt-image-2025--9--7-----04-10-17-1-1.png",
       username: "홍길동",
       likes: 40,
       isCenter: false,
