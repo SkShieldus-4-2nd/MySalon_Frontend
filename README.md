@@ -1,6 +1,6 @@
 ### 각 페이지별 파일 경로 정리
 * 메인페이지: src/components/ScrollContainer.jsx
-* 시작페이지:src/routes/Screen/screens/Screen.jsx
+* 시작페이지:src/routes/Screen34/screens/Screen.jsx
 * 상의 카테고리 페이지: src/routes/Screen39/screens/Screen.jsx
 * 로그인 페이지: src/routes/Screen113/screens/Screen.jsx
 * 회원가입 페이지: src/routes/SignupPage/screens/Screen.jsx

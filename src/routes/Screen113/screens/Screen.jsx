@@ -1,6 +1,7 @@
 import { MenuIcon, SearchIcon } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../lib/AuthContext";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -9,8 +10,9 @@ import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
 
 export const Screen = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [loginData, setLoginData] = useState({
-    username: "",
+    id: "",
     password: "",
     guestName: "",
     guestPhone: ""
@@ -161,8 +163,8 @@ export const Screen = () => {
                 <div className="flex-1 space-y-4">
                   <Input
                     placeholder="아이디"
-                    value={loginData.username}
-                    onChange={(e) => setLoginData(prev => ({ ...prev, username: e.target.value }))}
+                    value={loginData.id}
+                    onChange={(e) => setLoginData(prev => ({ ...prev, id: e.target.value }))}
                     className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[13px] text-center tracking-[0] leading-[18.2px]"
                   />
                   <Input

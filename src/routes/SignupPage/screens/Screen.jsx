@@ -166,9 +166,9 @@ export const Screen = () => {
   const navigationItems = [
     { name: "로그인", onClick: () => navigate("/login") },
     { name: "회원가입", onClick: () => navigate("/signup") },
-    { name: "장바구니", onClick: () => navigate("/") },
-    { name: "마이페이지", onClick: () => navigate("/") },
-    { name: "커뮤니티", onClick: () => navigate("/") },
+    { name: "장바구니", onClick: () => navigate("/cart") },
+    { name: "마이페이지", onClick: () => navigate("/mypage") },
+    { name: "커뮤니티", onClick: () => navigate("/community") },
   ];
 
   return (
@@ -277,6 +277,8 @@ export const Screen = () => {
             <Input
               id="password"
               type="password"
+              value={formData.password}
+              onChange={handleChange}
               className="top-[554px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
               value={formData.password}
               onChange={handleChange}
@@ -293,6 +295,8 @@ export const Screen = () => {
             <Input
               id="passwordConfirm"
               type="password"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
               className="top-[612px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
               value={formData.passwordConfirm}
               onChange={handleChange}
@@ -310,6 +314,8 @@ export const Screen = () => {
               <Input
                 id="secondPassword"
                 type="password"
+                value={formData.paymentPassword}
+                onChange={handleChange}
                 placeholder="6자리 숫자로 입력해주세요"
                 className="w-full h-full border-none rounded-none [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-xs leading-[16.8px] text-center tracking-[0]"
                 value={formData.secondPassword}
@@ -387,6 +393,8 @@ export const Screen = () => {
               <Input
                 id="tall"
                 type="number"
+                value={formData.height}
+                onChange={handleChange}
                 className="w-full h-full border-none rounded-none pr-8"
                 value={formData.tall}
                 onChange={handleChange}
@@ -408,6 +416,8 @@ export const Screen = () => {
               <Input
                 id="weight"
                 type="number"
+                value={formData.weight}
+                onChange={handleChange}
                 className="w-full h-full border-none rounded-none pr-8"
                 value={formData.weight}
                 onChange={handleChange}
@@ -450,7 +460,7 @@ export const Screen = () => {
             <Button
               variant="outline"
               className="absolute w-[242px] h-[60px] top-0 left-0 border border-solid border-[#828282] rounded-none bg-white hover:bg-gray-50 h-auto"
-              onClick={() => navigate("/mypage")}
+              onClick={() => navigate("/login")}
             >
               <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
                 취소

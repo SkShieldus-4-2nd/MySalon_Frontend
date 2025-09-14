@@ -1,6 +1,7 @@
 import { Edit3Icon, MenuIcon, SearchIcon, UploadIcon, Star } from "lucide-react";
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useAuth } from "../../../lib/AuthContext";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -9,21 +10,30 @@ import { Textarea } from "../components/ui/textarea";
 export const Screen = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { product_detail_num } = useParams();
+  const fileInputRef = useRef(null);
+  const { user, loading, authFetch } = useAuth();
+
   const isEdit = new URLSearchParams(location.search).get("mode") === "edit";
   const passedReview = location.state?.review || null;
 
-  // ⭐ 요구사항: 작성/수정 모두 0점(빈 별 5개)에서 시작
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(passedReview?.productImage || "https://c.animaapp.com/mfeskhdjLsBCWm/img/image-2.png");
 
-  // 수정 모드에서도 별점은 0으로 시작. (원하면 내용만 미리 채우기)
   useEffect(() => {
+    if (loading) return; // Wait until auth state is loaded
+
+    if (!user) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+    }
+
     if (isEdit && passedReview) {
-      // 별점은 0 유지
-      // 내용만 불러오고 싶으면 주석 해제:
       // setReviewText(passedReview.content ?? "");
     }
-  }, [isEdit, passedReview]);
+  }, [isEdit, passedReview, user, navigate, loading]);
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
@@ -33,19 +43,52 @@ export const Screen = () => {
     { name: "커뮤니티", onClick: () => navigate('/') },
   ];
 
-  const handleSubmit = () => {
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!user) {
+        alert("로그인이 필요합니다.");
+        return navigate("/login");
+    }
     if (rating === 0) return alert('별점을 선택해주세요.');
     if (!reviewText.trim()) return alert('리뷰 내용을 작성해주세요.');
 
-    if (isEdit) {
-      // TODO: PUT /reviews/:id
-      alert('리뷰가 수정되었습니다!');
-    } else {
-      // TODO: POST /reviews
-      alert('리뷰가 등록되었습니다!');
+    const formData = new FormData();
+    formData.append('score', rating);
+    formData.append('text', reviewText);
+    formData.append('userNum', user.userNum);
+    if (imageFile) {
+      formData.append('reviewImage', imageFile);
     }
-    navigate('/order-history');
+
+    try {
+      const response = await authFetch(`/api/reviews/${product_detail_num}`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert(isEdit ? '리뷰가 수정되었습니다!' : '리뷰가 등록되었습니다!');
+        navigate('/order-history');
+      } else {
+        const errorData = await response.json();
+        alert(`오류: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error('리뷰 제출 실패:', error);
+      alert('리뷰 제출에 실패했습니다.');
+    }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="bg-[#f1f1f1] grid justify-items-center [align-items:start] w-screen">
@@ -100,8 +143,8 @@ export const Screen = () => {
           <CardContent className="p-0 relative h-full">
             <img
               className="absolute w-[162px] h-[216px] top-[67px] left-[103px] object-cover"
-              alt="Image"
-              src={passedReview?.productImage || "https://c.animaapp.com/mfeskhdjLsBCWm/img/image-2.png"}
+              alt="Image Preview"
+              src={imagePreview}
             />
 
             <div className="absolute top-[83px] left-[295px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[23px] text-center tracking-[0] leading-[32.2px] whitespace-nowrap">
@@ -148,9 +191,17 @@ export const Screen = () => {
               placeholder="이 상품을 사용하면서 느낀 점을 작성해주세요"
             />
 
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+              accept="image/*"
+            />
             <Button
               variant="outline"
               className="absolute w-[149px] h-12 top-[455px] left-[111px] rounded-[10px] border-[0.4px] border-solid border-black h-auto"
+              onClick={() => fileInputRef.current.click()}
             >
               <UploadIcon className="w-[26px] h-[26px] mr-2" />
               <span className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] text-center tracking-[0] leading-[21px]">
