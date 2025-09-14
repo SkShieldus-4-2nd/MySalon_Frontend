@@ -1,5 +1,5 @@
 import { MenuIcon, SearchIcon, UserIcon } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Button } from "../components/ui/button";
@@ -14,6 +14,13 @@ import {
 
 export const Screen = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && user.type === "SELLER") {
+      navigate("/admin-mypage");
+    }
+  }, [navigate]);
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
