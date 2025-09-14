@@ -1,6 +1,7 @@
 import { MenuIcon, SearchIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -16,6 +17,17 @@ export const Screen = () => {
     guestPhone: ""
   });
 
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      if (user.type === "SELLER") {
+        navigate("/admin-mypage");
+      } else {
+        navigate("/mypage");
+      }
+    }
+  }, [navigate]);
+
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
     { name: "회원가입", onClick: () => navigate('/signup') },
@@ -30,14 +42,34 @@ export const Screen = () => {
     { value: "findPassword", label: "비밀번호 찾기", bgColor: "bg-[#d9d9d9]" },
   ];
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!loginData.username || !loginData.password) {
-      alert('아이디와 비밀번호를 입력해주세요.');
+      alert("아이디와 비밀번호를 입력해주세요.");
       return;
     }
-    // Simulate login success
-    alert('로그인 성공!');
-    navigate('/mypage');
+
+    try {
+      const response = await axios.post("/api/users/login", {
+        id: loginData.username,
+        password: loginData.password,
+      });
+
+      const { token, user } = response.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      if (user.type === "SELLER") {
+        alert("판매자로 로그인하였습니다.");
+        navigate("/admin-mypage");
+      } else {
+        alert("로그인 성공!");
+        navigate("/mypage");
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("아이디 또는 비밀번호가 틀렸습니다.");
+    }
   };
 
   const handleGuestOrder = () => {
