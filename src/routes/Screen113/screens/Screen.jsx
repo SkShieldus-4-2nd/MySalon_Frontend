@@ -15,6 +15,7 @@ export const Screen = () => {
     guestName: "",
     guestPhone: ""
   });
+  const [showLoginError, setShowLoginError] = useState(false);
 
   const navigationItems = [
     { name: "로그인", onClick: () => navigate('/login') },
@@ -30,14 +31,38 @@ export const Screen = () => {
     { value: "findPassword", label: "비밀번호 찾기", bgColor: "bg-[#d9d9d9]" },
   ];
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!loginData.username || !loginData.password) {
       alert('아이디와 비밀번호를 입력해주세요.');
       return;
     }
-    // Simulate login success
-    alert('로그인 성공!');
-    navigate('/mypage');
+
+    try {
+      const response = await fetch('http://localhost:8080/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: loginData.username,
+          password: loginData.password,
+        }),
+      });
+
+      if (response.ok) {
+        const token = await response.text();
+        localStorage.setItem('token', token);
+        alert('로그인 성공!');
+        navigate('/mypage');
+        setShowLoginError(false);
+      } else {
+        setShowLoginError(true);
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('로그인 중 오류가 발생했습니다.');
+      setShowLoginError(true);
+    }
   };
 
   const handleGuestOrder = () => {
@@ -157,7 +182,7 @@ export const Screen = () => {
               </div>
 
               <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-red-500 text-[8px] text-center tracking-[0] leading-[11.2px] whitespace-nowrap">
-                {loginData.username && loginData.password && "아이디 또는 비밀번호가 틀렸습니다."}
+                {showLoginError && "아이디 또는 비밀번호가 틀렸습니다."}
               </div>
             </div>
 
@@ -182,40 +207,6 @@ export const Screen = () => {
                 ))}
               </TabsList>
             </Tabs>
-
-            {/* Non-member Order Inquiry Section */}
-            <div className="w-[361px] h-[340px]">
-              <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl text-center tracking-[0] leading-7 whitespace-nowrap mb-[38px]">
-                비회원 주문조회
-              </div>
-
-              <div className="flex gap-4 mb-4">
-                <div className="flex-1 space-y-4">
-                  <Input
-                    placeholder="주문자명"
-                    value={loginData.guestName}
-                    onChange={(e) => setLoginData(prev => ({ ...prev, guestName: e.target.value }))}
-                    className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[13px] text-center tracking-[0] leading-[18.2px]"
-                  />
-                  <Input
-                    placeholder="전화번호"
-                    value={loginData.guestPhone}
-                    onChange={(e) => setLoginData(prev => ({ ...prev, guestPhone: e.target.value }))}
-                    className="w-[234px] h-8 border-[0.6px] border-solid border-[#828282] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[13px] text-center tracking-[0] leading-[18.2px]"
-                  />
-                </div>
-                <Button 
-                  className="w-[97px] h-[75px] bg-[url(https://c.animaapp.com/mfewut4deCnHxk/img/rectangle-29.svg)] bg-[100%_100%] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[15px] text-center tracking-[0] leading-[21px] h-auto"
-                  onClick={handleGuestOrder}
-                >
-                  확인
-                </Button>
-              </div>
-
-              <div className="[font-family:'SF_Pro-Regular',Helvetica] font-normal text-red-500 text-[8px] text-center tracking-[0] leading-[11.2px] whitespace-nowrap">
-                {loginData.guestName && loginData.guestPhone && "조회 내역이 없습니다."}
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>

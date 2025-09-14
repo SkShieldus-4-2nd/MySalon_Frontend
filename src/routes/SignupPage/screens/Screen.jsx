@@ -1,19 +1,166 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
-import { Separator } from "../components/ui/separator";
+
+// 필요한 UI 컴포넌트들을 이 파일 내부에 직접 정의합니다.
+// 이렇게 하면 import 오류를 해결하고 하나의 파일로 만듭니다.
+const Button = ({ asChild, variant, size, className, children, onClick }) => {
+  const Comp = asChild ? "Link" : 'button';
+  return (
+    <Comp
+      className={`
+        inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium
+        transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+        focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50
+        ${variant === 'ghost' ? 'hover:bg-accent hover:text-accent-foreground' : ''}
+        ${variant === 'outline' ? 'border border-input bg-background hover:bg-accent hover:text-accent-foreground' : ''}
+        ${className || ''}
+      `}
+      onClick={onClick}
+    >
+      {children}
+    </Comp>
+  );
+};
+
+const Input = ({ className, ...props }) => (
+  <input
+    className={`
+      flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+      file:border-0 file:bg-transparent file:text-sm file:font-medium
+      placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+      focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50
+      ${className || ''}
+    `}
+    {...props}
+  />
+);
+
+const Label = ({ className, children, ...props }) => (
+  <label className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className || ''}`} {...props}>
+    {children}
+  </label>
+);
+
+const RadioGroup = ({ className, children, ...props }) => (
+  <div className={`grid gap-2 ${className || ''}`} {...props}>
+    {children}
+  </div>
+);
+
+const RadioGroupItem = ({ className, isChecked, ...props }) => (
+  <button
+    type="button"
+    role="radio"
+    aria-checked={isChecked}
+    data-state={isChecked ? "checked" : "unchecked"}
+    className={`flex justify-center items-center aspect-square h-4 w-4 rounded-full border border-primary text-primary shadow focus:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className || ''}`}
+    {...props}
+  >
+    {isChecked && <div className="w-[12px] h-[12px] rounded-full bg-gray-800" />}
+  </button>
+);
+
+const Separator = ({ className }) => (
+  <div className={`h-[1px] w-full bg-gray-300 ${className}`}></div>
+);
 
 export const Screen = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState("buyer");
+  const [formData, setFormData] = useState({
+    id: "",
+    password: "",
+    passwordConfirm: "",
+    secondPassword: "",
+    userName: "",
+    gender: "MALE",
+    tall: "",
+    weight: "",
+    storeName: "",
+  });
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = () => {
-    // Handle signup logic here
-    alert("회원가입이 완료되었습니다!");
-    navigate("/");
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }));
+  };
+
+  const handleRadioChange = (name, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    setMessage("");
+
+    // 비밀번호 확인
+    if (formData.password !== formData.passwordConfirm) {
+      setMessage("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    // 필수 정보 누락 확인
+    if (
+      !formData.id ||
+      !formData.password ||
+      !formData.userName ||
+      !formData.secondPassword
+    ) {
+      setMessage("필수 정보를 모두 입력해주세요.");
+      return;
+    }
+
+    // 결제 비밀번호 6자리 숫자 확인
+    if (!/^\d{6}$/.test(formData.secondPassword)) {
+      setMessage("결제 비밀번호는 6자리 숫자로 입력해주세요.");
+      return;
+    }
+
+    // 전화번호 - 없이 입력 확인
+    if (formData.phone && !/^\d+$/.test(formData.phone)) {
+      setMessage("전화번호는 숫자만 입력해주세요.");
+      return;
+    }
+
+    const requestBody = {
+      id: formData.id,
+      password: formData.password,
+      userName: formData.userName,
+      secondPassword: formData.secondPassword,
+      profileImage: null, // 프로필 이미지 입력 필드가 없어 null로 설정
+      gender: formData.gender,
+      tall: formData.tall ? Number(formData.tall) : 0,
+      weight: formData.weight ? Number(formData.weight) : 0,
+      type: userType.toUpperCase(),
+      storeName: userType === "seller" ? formData.storeName : null,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error("네트워크 응답이 올바르지 않습니다.");
+      }
+
+      const result = await response.json();
+      console.log("회원가입 성공:", result);
+      alert("회원가입에 성공했습니다.");
+      navigate("/login");
+    } catch (error) {
+      setMessage("회원가입 중 오류가 발생했습니다: " + error.message);
+      console.error("회원가입 오류:", error);
+    }
   };
 
   const navigationItems = [
@@ -78,7 +225,9 @@ export const Screen = () => {
                 <RadioGroupItem
                   value="buyer"
                   id="buyer"
+                  isChecked={userType === "buyer"}
                   className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
+                  onClick={() => setUserType("buyer")}
                 />
                 <Label
                   htmlFor="buyer"
@@ -91,7 +240,9 @@ export const Screen = () => {
                 <RadioGroupItem
                   value="seller"
                   id="seller"
+                  isChecked={userType === "seller"}
                   className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
+                  onClick={() => setUserType("seller")}
                 />
                 <Label
                   htmlFor="seller"
@@ -110,15 +261,17 @@ export const Screen = () => {
 
             <div className="absolute top-[493px] left-[471px]">
               <Label
-                htmlFor="username"
+                htmlFor="id"
                 className="w-14 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
               >
                 아이디
               </Label>
             </div>
             <Input
-              id="username"
+              id="id"
               className="top-[492px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+              value={formData.id}
+              onChange={handleChange}
             />
 
             <div className="absolute top-[553px] left-[462px]">
@@ -133,6 +286,8 @@ export const Screen = () => {
               id="password"
               type="password"
               className="top-[554px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+              value={formData.password}
+              onChange={handleChange}
             />
 
             <div className="absolute top-[613px] left-[441px]">
@@ -147,14 +302,13 @@ export const Screen = () => {
               id="passwordConfirm"
               type="password"
               className="top-[612px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+              value={formData.passwordConfirm}
+              onChange={handleChange}
             />
-            <div className="top-[645px] left-[606px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-[8px] leading-[11.2px] absolute text-center tracking-[0] whitespace-nowrap">
-              비밀번호가 틀렸습니다.
-            </div>
 
             <div className="absolute top-[673px] left-[441px]">
               <Label
-                htmlFor="paymentPassword"
+                htmlFor="secondPassword"
                 className="w-[116px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
               >
                 결제 비밀번호
@@ -162,43 +316,29 @@ export const Screen = () => {
             </div>
             <div className="absolute w-[398px] h-8 top-[672px] left-[606px] border-[0.6px] border-solid border-[#828282]">
               <Input
-                id="paymentPassword"
+                id="secondPassword"
                 type="password"
                 placeholder="6자리 숫자로 입력해주세요"
                 className="w-full h-full border-none rounded-none [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-xs leading-[16.8px] text-center tracking-[0]"
+                value={formData.secondPassword}
+                onChange={handleChange}
               />
             </div>
 
             <div className="absolute top-[733px] left-[437px]">
               <Label
-                htmlFor="name"
+                htmlFor="userName"
                 className="w-[125px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
               >
                 이름(닉네임)
               </Label>
             </div>
             <Input
-              id="name"
+              id="userName"
               className="top-[734px] absolute w-[398px] h-8 left-[606px] border-[0.6px] border-solid border-[#828282] rounded-none"
+              value={formData.userName}
+              onChange={handleChange}
             />
-
-            <div className="absolute top-[794px] left-[462px]">
-              <Label
-                htmlFor="phone"
-                className="w-[74px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
-              >
-                전화번호
-              </Label>
-            </div>
-            <div className="absolute w-[398px] h-8 top-[793px] left-[606px] border-[0.6px] border-solid border-[#828282]">
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="- 없이 입력하세요."
-                className="w-full h-full border-none rounded-none [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#999999] text-[10px] leading-[14px] text-center tracking-[0]"
-              />
-            </div>
-
             <div className="absolute top-[854px] left-[481px]">
               <Label className="w-[37px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap">
                 성별
@@ -206,14 +346,17 @@ export const Screen = () => {
             </div>
             <RadioGroup
               className="absolute w-[184px] h-[22px] top-[859px] left-[606px]"
-              defaultValue="male"
+              value={formData.gender}
+              onValueChange={(value) => handleRadioChange("gender", value)}
             >
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center space-x-3">
                   <RadioGroupItem
-                    value="male"
+                    value="MALE"
                     id="male"
+                    isChecked={formData.gender === "MALE"}
                     className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
+                    onClick={() => handleRadioChange("gender", "MALE")}
                   />
                   <Label
                     htmlFor="male"
@@ -224,9 +367,11 @@ export const Screen = () => {
                 </div>
                 <div className="flex items-center space-x-3">
                   <RadioGroupItem
-                    value="female"
+                    value="FEMALE"
                     id="female"
+                    isChecked={formData.gender === "FEMALE"}
                     className="w-[22px] h-[22px] rounded-[11px] border-[0.7px] border-solid border-[#828282]"
+                    onClick={() => handleRadioChange("gender", "FEMALE")}
                   />
                   <Label
                     htmlFor="female"
@@ -240,7 +385,7 @@ export const Screen = () => {
 
             <div className="absolute top-[917px] left-[481px]">
               <Label
-                htmlFor="height"
+                htmlFor="tall"
                 className="w-[37px] [font-family:'SF_Pro-Regular',Helvetica] font-normal text-black text-xl leading-7 text-center tracking-[0] whitespace-nowrap"
               >
                 키
@@ -248,9 +393,11 @@ export const Screen = () => {
             </div>
             <div className="absolute w-32 h-8 top-[914px] left-[606px] border-[0.6px] border-solid border-[#828282]">
               <Input
-                id="height"
+                id="tall"
                 type="number"
                 className="w-full h-full border-none rounded-none pr-8"
+                value={formData.tall}
+                onChange={handleChange}
               />
               <div className="absolute top-1 right-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px] whitespace-nowrap">
                 cm
@@ -270,6 +417,8 @@ export const Screen = () => {
                 id="weight"
                 type="number"
                 className="w-full h-full border-none rounded-none pr-8"
+                value={formData.weight}
+                onChange={handleChange}
               />
               <div className="absolute top-1 right-2 [font-family:'SF_Pro-Regular',Helvetica] font-normal text-[#828282] text-[15px] text-center tracking-[0] leading-[21px] whitespace-nowrap">
                 kg
@@ -289,15 +438,21 @@ export const Screen = () => {
 
               <Input
                 id="storeName"
-                disabled={userType !== "seller"}  // 판매자만 활성화
+                disabled={userType !== "seller"}
                 className={`w-[398px] h-8 border-[0.6px] rounded-none ${
                   userType === "seller"
                     ? "border-[#828282] bg-white"
                     : "border-[#d0d0d0] bg-[#f5f5f5] text-[#999999] cursor-not-allowed"
                 }`}
+                value={userType === "seller" ? formData.storeName : ""}
+                onChange={handleChange}
               />
             </div>
           </section>
+          
+          <div className="text-center text-red-500 mt-4 absolute w-full top-[1020px] left-0">
+            {message && <span>{message}</span>}
+          </div>
 
           <div className="absolute w-[539px] h-[60px] top-[1049px] left-[466px]">
             <Button

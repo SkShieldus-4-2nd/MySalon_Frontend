@@ -6,20 +6,104 @@ import {
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Button } from "../components/ui/button";
-import { Card, CardContent } from "../components/ui/card";
-import { Input } from "../components/ui/input";
+
+// 외부 컴포넌트들을 이 파일 내부에 직접 정의합니다.
+// 이렇게 하면 import 오류를 해결할 수 있습니다.
+const Button = ({ asChild, variant, size, className, children, onClick }) => {
+  const Comp = asChild ? Link : 'button';
+  return (
+    <Comp
+      className={`
+        inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium
+        transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+        focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50
+        ${variant === 'ghost' ? 'hover:bg-accent hover:text-accent-foreground' : ''}
+        ${variant === 'outline' ? 'border border-input bg-background hover:bg-accent hover:text-accent-foreground' : ''}
+        ${className || ''}
+      `}
+      onClick={onClick}
+      to={asChild ? children.props.to : null}
+    >
+      {asChild ? children.props.children : children}
+    </Comp>
+  );
+};
+
+const Card = ({ className, children }) => (
+  <div className={`rounded-xl border bg-card text-card-foreground shadow ${className || ''}`}>
+    {children}
+  </div>
+);
+
+const CardContent = ({ className, children }) => (
+  <div className={`p-6 pt-0 ${className || ''}`}>
+    {children}
+  </div>
+);
+
+const Input = ({ className, ...props }) => (
+  <input
+    className={`
+      flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background
+      file:border-0 file:bg-transparent file:text-sm file:font-medium
+      placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+      focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50
+      ${className || ''}
+    `}
+    {...props}
+  />
+);
+
+const Avatar = ({ className, children }) => (
+  <div className={`relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full ${className || ''}`}>
+    {children}
+  </div>
+);
+
+const AvatarImage = ({ className, src, ...props }) => (
+  <img className={`aspect-square h-full w-full ${className || ''}`} src={src} {...props} />
+);
+
+const AvatarFallback = ({ className, children }) => (
+  <div className={`flex h-full w-full items-center justify-center rounded-full bg-muted ${className || ''}`}>
+    {children}
+  </div>
+);
 
 export const Screen = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // URL 에 맞춰 탭 하이라이트
   const [activeTab, setActiveTab] = useState("today");
+  const [outfits, setOutfits] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     setActiveTab(location.pathname.startsWith("/board") ? "board" : "today");
   }, [location.pathname]);
+
+  // API에서 데이터를 불러오는 useEffect 훅
+  useEffect(() => {
+    const fetchOutfits = async () => {
+      try {
+        const token = localStorage.getItem("token"); // 로컬 스토리지에서 토큰 가져오기
+        const response = await fetch("http://localhost:8080/api/posts/coordi", {
+          headers: {
+            Authorization: `Bearer ${token}`, // 인증 헤더 추가
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setOutfits(data);
+      } catch (error) {
+        console.error("Failed to fetch outfits:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOutfits();
+  }, []);
 
   const topNavItems = [
     { name: "로그인", onClick: () => navigate("/login") },
@@ -29,48 +113,35 @@ export const Screen = () => {
     { name: "커뮤니티", onClick: () => navigate("/community") },
   ];
 
-  const featuredOutfits = [
-    {
-      id: 1,
-      title: "여름 원피스 코디",
-      category: "휴양지룩",
-      image: "https://c.animaapp.com/mfezbbicpZVDGC/img/image-1-4.png",
-      avatar:
-        "https://c.animaapp.com/mfezbbicpZVDGC/img/chatgpt-image-2025--9--7-----04-10-17-1-1.png",
-      username: "홍길동",
-      likes: 35,
-      isCenter: false,
-    },
-    {
-      id: 2,
-      title: "여름 원피스 코디",
-      category: "휴양지룩",
-      image: "https://c.animaapp.com/mfezbbicpZVDGC/img/image-1-4.png",
-      avatar:
-        "https://c.animaapp.com/mfezbbicpZVDGC/img/chatgpt-image-2025--9--7-----04-10-17-1-2.png",
-      username: "홍길동",
-      likes: 50,
-      isCenter: true,
-    },
-    {
-      id: 3,
-      title: "여름 원피스 코디",
-      category: "휴양지룩",
-      image: "https://c.animaapp.com/mfezbbicpZVDGC/img/image-1-4.png",
-      avatar:
-        "https://c.animaapp.com/mfezbbicpZVDGC/img/chatgpt-image-2025--9--7-----04-10-17-1.png",
-      username: "홍길동",
-      likes: 40,
-      isCenter: false,
-    },
-  ];
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-lg">
+        로딩 중...
+      </div>
+    );
+  }
 
-  const gridOutfits = [
-    { id: 4, title: "여름 원피스 코디", category: "휴양지룩", image: "https://c.animaapp.com/mfezbbicpZVDGC/img/image-1-4.png", avatar:"https://c.animaapp.com/mfezbbicpZVDGC/img/chatgpt-image-2025--9--7-----04-10-17-1-3.png", username: "홍길동", likes: 50 },
-    { id: 5, title: "여름 원피스 코디", category: "휴양지룩", image: "https://c.animaapp.com/mfezbbicpZVDGC/img/image-1-4.png", avatar:"https://c.animaapp.com/mfezbbicpZVDGC/img/chatgpt-image-2025--9--7-----04-10-17-1-4.png", username: "홍길동", likes: 50 },
-    { id: 6, title: "여름 원피스 코디", category: "휴양지룩", image: "https://c.animaapp.com/mfezbbicpZVDGC/img/image-1-4.png", avatar:"https://c.animaapp.com/mfezbbicpZVDGC/img/chatgpt-image-2025--9--7-----04-10-17-1-5.png", username: "홍길동", likes: 50 },
-    { id: 7, title: "여름 원피스 코디", category: "휴양지룩", image: "https://c.animaapp.com/mfezbbicpZVDGC/img/image-1-4.png", avatar:"https://c.animaapp.com/mfezbbicpZVDGC/img/chatgpt-image-2025--9--7-----04-10-17-1-6.png", username: "홍길동", likes: 50 },
-  ];
+  // API에서 받아온 데이터로 캐러셀과 그리드용 배열 생성
+  const featuredOutfits = outfits.map((item, index) => ({
+    id: item.postNum,
+    title: item.title,
+    category: "휴양지룩", // API에 없는 데이터이므로 임의 지정
+    image: item.coordiImage,
+    avatar: item.userImage,
+    username: item.writer,
+    likes: item.likeCount,
+    
+  }));
+
+  const gridOutfits = outfits.slice(3, 7).map((item) => ({
+    id: item.postNum,
+    title: item.title,
+    category: "휴양지룩", // API에 없는 데이터이므로 임의 지정
+    image: item.coordiImage,
+    avatar: item.userImage,
+    username: item.writer,
+    likes: item.likeCount,
+  }));
 
   return (
     <div className="bg-white min-h-screen w-full">
