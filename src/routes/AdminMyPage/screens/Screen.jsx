@@ -15,16 +15,18 @@ const ProductRegisterForm = () => {
     description: "",
     price: "",
     shippingFee: "",
-    color: "",
-    size: "",
-    maxQty: "",
     image: null,
   });
 
-  // 최대수량을 여러 개로 관리(시연용)
-  const [maxQtyList, setMaxQtyList] = useState([]);
+  const [variant, setVariant] = useState({
+    color: "",
+    size: "",
+    maxQty: "",
+  });
 
-  const onChange = (e) => {
+  const [variants, setVariants] = useState([]);
+
+  const onFormChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
       setForm((s) => ({ ...s, image: files?.[0] ?? null }));
@@ -33,34 +35,42 @@ const ProductRegisterForm = () => {
     }
   };
 
-  // "추가하기" 버튼
-  const addMaxQty = () => {
-    const v = String(form.maxQty).trim();
-    if (!v) return;
-    const num = Number(v);
+  const onVariantChange = (e) => {
+    const { name, value } = e.target;
+    setVariant((s) => ({ ...s, [name]: value }));
+  };
+
+  const addVariant = () => {
+    const { color, size, maxQty } = variant;
+    if (!color.trim() || !size.trim() || !maxQty.trim()) {
+      alert("색상, 사이즈, 최대수량을 모두 입력해주세요.");
+      return;
+    }
+    const num = Number(maxQty);
     if (Number.isNaN(num) || num < 0) {
       alert("최대수량은 0 이상의 숫자로 입력해주세요.");
       return;
     }
-    setMaxQtyList((prev) => [...prev, num]);
-    setForm((s) => ({ ...s, maxQty: "" }));
+    setVariants((prev) => [...prev, { ...variant, maxQty: num }]);
+    setVariant({ color: "", size: "", maxQty: "" }); // Reset variant form
   };
 
-  const removeQty = (index) => {
-    setMaxQtyList((prev) => prev.filter((_, i) => i !== index));
+  const removeVariant = (index) => {
+    setVariants((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const editVariant = (v, index) => {
+    setVariant(v);
+    removeVariant(index);
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
-    // TODO: 실제 API 연동 시 FormData 사용 권장
-    // const fd = new FormData();
-    // Object.entries({ ...form, maxQtyList }).forEach(([k, v]) => {
-    //   if (k === "image" && v) fd.append(k, v);
-    //   else fd.append(k, Array.isArray(v) ? JSON.stringify(v) : String(v ?? ""));
-    // });
-    // await fetch("/api/products", { method: "POST", body: fd });
-
-    console.log("상품등록 payload:", { ...form, maxQtyList });
+    if (variants.length === 0) {
+      alert("하나 이상의 상품 옵션을 추가해주세요.");
+      return;
+    }
+    console.log("상품등록 payload:", { ...form, variants });
     alert("등록 API 연동은 추후 진행하세요!");
   };
 
@@ -82,7 +92,7 @@ const ProductRegisterForm = () => {
                 type="file"
                 accept="image/*"
                 name="image"
-                onChange={onChange}
+                onChange={onFormChange}
                 className="hidden"
               />
             </label>
@@ -94,67 +104,75 @@ const ProductRegisterForm = () => {
       <div className="col-span-8 space-y-4">
         <div className="flex items-center gap-4">
           <span className="w-24 text-sm text-[#444]">상품이름</span>
-          <Input name="name" value={form.name} onChange={onChange} />
+          <Input name="name" value={form.name} onChange={onFormChange} />
         </div>
         <div className="flex items-center gap-4">
           <span className="w-24 text-sm text-[#444]">상품설명</span>
-          <Input name="description" value={form.description} onChange={onChange} />
+          <Input name="description" value={form.description} onChange={onFormChange} />
         </div>
         <div className="flex items-center gap-4">
           <span className="w-24 text-sm text-[#444]">가격</span>
-          <Input name="price" value={form.price} onChange={onChange} placeholder="예: 50000" />
+          <Input name="price" value={form.price} onChange={onFormChange} placeholder="예: 50000" />
         </div>
         <div className="flex items-center gap-4">
           <span className="w-24 text-sm text-[#444]">배송비</span>
           <Input
             name="shippingFee"
             value={form.shippingFee}
-            onChange={onChange}
+            onChange={onFormChange}
             placeholder="예: 3000"
           />
         </div>
+        
+        <hr className="my-4 border-t border-gray-300" />
+        <p className="text-base font-medium text-gray-700">상품 옵션 등록</p>
+
         <div className="flex items-center gap-4">
           <span className="w-24 text-sm text-[#444]">색상</span>
-          <Input name="color" value={form.color} onChange={onChange} placeholder="예: Black, White" />
+          <Input name="color" value={variant.color} onChange={onVariantChange} placeholder="예: Blue" />
         </div>
         <div className="flex items-center gap-4">
           <span className="w-24 text-sm text-[#444]">사이즈</span>
-          <Input name="size" value={form.size} onChange={onChange} placeholder="예: S, M, L" />
+          <Input name="size" value={variant.size} onChange={onVariantChange} placeholder="예: L" />
         </div>
-
-        {/* 최대수량 + 추가하기 버튼 */}
         <div className="flex items-center gap-4">
           <span className="w-24 text-sm text-[#444]">최대수량</span>
           <div className="flex items-center gap-2 w-full max-w-[360px]">
             <Input
               name="maxQty"
-              value={form.maxQty}
-              onChange={onChange}
-              placeholder="예: 10"
+              value={variant.maxQty}
+              onChange={onVariantChange}
+              placeholder="예: 120"
               inputMode="numeric"
             />
             <Button
               type="button"
-              onClick={addMaxQty}
-              className="h-[32px] px-3 bg-[#8b8b8b] hover:bg-[#6f6f6f] text-white rounded-none text-[12px]"
+              onClick={addVariant}
+              className="h-[32px] px-3 bg-[#8b8b8b] hover:bg-[#6f6f6f] text-white rounded-none text-[12px] shrink-0"
             >
-              추가하기
+              옵션 추가
             </Button>
           </div>
         </div>
 
-        {/* 추가된 수량 태그 표시(옵션) */}
-        {maxQtyList.length > 0 && (
+        {/* 추가된 옵션(variant) 태그 표시 */}
+        {variants.length > 0 && (
           <div className="ml-[calc(6rem+1rem)] flex flex-wrap gap-2">
-            {maxQtyList.map((q, i) => (
+            {variants.map((v, i) => (
               <div
-                key={`${q}-${i}`}
-                className="flex items-center gap-2 px-2 py-1 border border-[#d1d1d1] text-[12px]"
+                key={i}
+                className="flex items-center gap-2 px-2 py-1 border border-[#d1d1d1] text-[12px] bg-gray-50 rounded"
               >
-                {q}
+                <span
+                  className="cursor-pointer hover:font-semibold"
+                  onClick={() => editVariant(v, i)}
+                  title="클릭하여 수정"
+                >
+                  {`색상: ${v.color}, 사이즈: ${v.size}, 수량: ${v.maxQty}`}
+                </span>
                 <button
                   type="button"
-                  onClick={() => removeQty(i)}
+                  onClick={() => removeVariant(i)}
                   className="text-[#888] hover:text-black"
                   aria-label="remove"
                 >
