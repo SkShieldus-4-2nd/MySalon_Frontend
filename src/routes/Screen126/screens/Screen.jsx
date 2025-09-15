@@ -1,6 +1,6 @@
 // src/routes/Screen126/screens/Screen.jsx
-import React, { useMemo, useState, useMemo as useReactMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useMemo, useState, useMemo as useReactMemo, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { MicIcon, SearchIcon } from "lucide-react";
@@ -8,29 +8,147 @@ import { MicIcon, SearchIcon } from "lucide-react";
 export const Screen = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const { productNum } = useParams();
 
-  // --- 상품 기본값 ---
-  const fallback = {
-    name: "상품이름",
-    image:
-      "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1470&auto=format&fit=crop",
-    price: "500000원",
-    shipFee: "3500원",
-    colors: ["Black", "White", "Red"],
-    sizes: ["S", "M", "L", "XL"],
-    desc:
-      "상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다.",
-  };
-
-  const product = useMemo(() => {
-    const p = state?.product || {};
-    return { ...fallback, ...p, price: p.price || fallback.price };
-  }, [state]);
+  // --- 상품 상태 ---
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [productDetails, setProductDetails] = useState([]);
 
   // --- 옵션/수량 ---
-  const [color, setColor] = useState(product.colors[0]);
-  const [size, setSize] = useState("");
-  const [qty, setQty] = useState(2);
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+  const [quantity, setQuantity] = useState(1);
+
+  // --- 상품 정보 로드 ---
+  useEffect(() => {
+    const loadProduct = async () => {
+      setLoading(true);
+      try {
+        // URL 파라미터에서 productNum 가져오기 (우선순위)
+        const targetProductNum = productNum || state?.product?.productNum;
+        
+        if (targetProductNum) {
+          // 백엔드에서 상품 상세 정보 가져오기
+          const response = await fetch(`http://localhost:8080/api/products/detail/${targetProductNum}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (response.ok) {
+            const productData = await response.json();
+            setProduct(productData);
+            setProductDetails(productData.productDetails || []);
+            
+            // 첫 번째 색상으로 초기화
+            if (productData.productDetails && productData.productDetails.length > 0) {
+              const firstColor = productData.productDetails[0].color;
+              setSelectedColor(firstColor);
+            }
+          } else {
+            // 실패 시 state 데이터 사용 (있는 경우)
+            if (state?.product) {
+              setProduct(state.product);
+              setProductDetails([]);
+            } else {
+              // 기본값 사용
+              const fallback = {
+                productNum: parseInt(targetProductNum) || 1,
+                productName: "상품이름",
+                price: 500000,
+                deliveryFee: 3500,
+                mainImage: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1470&auto=format&fit=crop",
+                description: "상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다.",
+                productDetails: [
+                  { color: "Black", size: "S", count: 10 },
+                  { color: "Black", size: "M", count: 15 },
+                  { color: "White", size: "S", count: 8 },
+                  { color: "White", size: "M", count: 12 },
+                  { color: "Red", size: "L", count: 5 },
+                ]
+              };
+              setProduct(fallback);
+              setProductDetails(fallback.productDetails);
+              setSelectedColor(fallback.productDetails[0].color);
+            }
+          }
+        } else {
+          // productNum이 없는 경우 기본값 사용
+          const fallback = {
+            productNum: 1,
+            productName: "상품이름",
+            price: 500000,
+            deliveryFee: 3500,
+            mainImage: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1470&auto=format&fit=crop",
+            description: "상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다.",
+            productDetails: [
+              { color: "Black", size: "S", count: 10 },
+              { color: "Black", size: "M", count: 15 },
+              { color: "White", size: "S", count: 8 },
+              { color: "White", size: "M", count: 12 },
+              { color: "Red", size: "L", count: 5 },
+            ]
+          };
+          setProduct(fallback);
+          setProductDetails(fallback.productDetails);
+          setSelectedColor(fallback.productDetails[0].color);
+        }
+      } catch (error) {
+        console.error("상품 정보 로드 실패:", error);
+        // 에러 시 기본값 사용
+        const fallback = {
+          productNum: parseInt(productNum) || 1,
+          productName: "상품이름",
+          price: 500000,
+          deliveryFee: 3500,
+          mainImage: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1470&auto=format&fit=crop",
+          description: "상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다. 상품 설명 입니다.",
+          productDetails: [
+            { color: "Black", size: "S", count: 10 },
+            { color: "Black", size: "M", count: 15 },
+            { color: "White", size: "S", count: 8 },
+            { color: "White", size: "M", count: 12 },
+            { color: "Red", size: "L", count: 5 },
+          ]
+        };
+        setProduct(fallback);
+        setProductDetails(fallback.productDetails);
+        setSelectedColor(fallback.productDetails[0].color);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProduct();
+  }, [productNum, state]);
+
+  // 사용 가능한 색상 목록
+  const availableColors = useMemo(() => {
+    const colors = [...new Set(productDetails.map(detail => detail.color))];
+    return colors;
+  }, [productDetails]);
+
+  // 선택된 색상에 따른 사용 가능한 사이즈 목록
+  const availableSizes = useMemo(() => {
+    if (!selectedColor) return [];
+    const sizes = productDetails
+      .filter(detail => detail.color === selectedColor)
+      .map(detail => detail.size);
+    return [...new Set(sizes)];
+  }, [productDetails, selectedColor]);
+
+  // 색상 변경 시 사이즈 초기화
+  const handleColorChange = (color) => {
+    setSelectedColor(color);
+    setSelectedSize("");
+  };
+
+  // 사이즈 변경
+  const handleSizeChange = (size) => {
+    setSelectedSize(size);
+  };
 
   // --- 결제 모달 상태 ---
   const [openPay, setOpenPay] = useState(false);
@@ -39,8 +157,19 @@ export const Screen = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const openPayModal = () => {
-    // 예: 옵션 필수 검증
-    // if (!size) return alert("사이즈를 선택하세요.");
+    // 옵션 필수 검증
+    if (!selectedColor) {
+      alert("색상을 선택하세요.");
+      return;
+    }
+    if (!selectedSize) {
+      alert("사이즈를 선택하세요.");
+      return;
+    }
+    if (quantity < 1) {
+      alert("수량을 입력하세요.");
+      return;
+    }
     setOpenPay(true);
   };
 
@@ -52,7 +181,27 @@ export const Screen = () => {
     }
     try {
       setSubmitting(true);
-      // TODO: 실제 결제 API 호출 위치
+      
+      // 주문 정보 생성
+      const orderData = {
+        productNum: product.productNum,
+        productName: product.productName,
+        price: product.price,
+        deliveryFee: product.deliveryFee,
+        color: selectedColor,
+        size: selectedSize,
+        quantity: quantity,
+        totalPrice: (product.price * quantity) + product.deliveryFee,
+        buyerName: "홍길동", // 실제로는 로그인한 사용자 정보 사용
+        buyerNum: 1, // 실제로는 로그인한 사용자 번호 사용
+      };
+
+      // TODO: 실제 주문 API 호출
+      // const response = await fetch("http://localhost:8080/api/orders", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(orderData)
+      // });
 
       const d = new Date();
       const orderedAt = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(
@@ -62,8 +211,7 @@ export const Screen = () => {
 
       navigate("/payment", {
         state: {
-          productName: product.name,
-          buyerName: "홍길동",
+          ...orderData,
           orderedAt,
         },
       });
@@ -203,123 +351,141 @@ export const Screen = () => {
         <div className="grid grid-cols-12 gap-10 px-[100px]">
           <div className="col-span-5 flex justify-center">
             <div className="w-[480px]">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full aspect-[4/5] object-cover"
-              />
+              {loading ? (
+                <div className="w-full aspect-[4/5] bg-gray-200 flex items-center justify-center">
+                  <div className="text-gray-500">로딩 중...</div>
+                </div>
+              ) : (
+                <img
+                  src={product?.mainImage && product.mainImage !== "default.jpg" 
+                    ? `http://localhost:8080${product.mainImage}` 
+                    : "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1470&auto=format&fit=crop"}
+                  alt={product?.productName || "상품 이미지"}
+                  className="w-full aspect-[4/5] object-cover"
+                />
+              )}
             </div>
           </div>
 
           <div className="col-span-7">
-            <h1 className="text-[28px] font-semibold text-[#222] mb-[10px]">
-              {product.name}
-            </h1>
-            <p className="text-[13px] text-[#666] leading-[20px] mb-[18px]">
-              {product.desc}
-            </p>
-            {/* 구분선 */}
-            <div className="h-px w-full bg-[#e5e7eb] mb-[18px]" />
-
-            <div className="text-[15px] space-y-[14px]">
-              <div className="flex items-center">
-                <div className="w-[90px] text-[#333]">가격</div>
-                <div className="text-[#111]">{product.price}</div>
+            {loading ? (
+              <div className="space-y-4">
+                <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
               </div>
-              <div className="flex items-center">
-                <div className="w-[90px] text-[#333]">배송비</div>
-                <div className="text-[#111]">{product.shipFee}</div>
-              </div>
+            ) : (
+              <>
+                <h1 className="text-[28px] font-semibold text-[#222] mb-[10px]">
+                  {product?.productName || "상품이름"}
+                </h1>
+                <p className="text-[13px] text-[#666] leading-[20px] mb-[18px]">
+                  {product?.description || "상품 설명이 없습니다."}
+                </p>
+                {/* 구분선 */}
+                <div className="h-px w-full bg-[#e5e7eb] mb-[18px]" />
 
-              {/* 색상 */}
-              <div className="flex items-center">
-                <div className="w-[90px] text-[#333]">색상</div>
-                <div className="flex gap-2">
-                  {product.colors.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => setColor(c)}
-                      className={`px-3 h-[28px] border rounded text-[13px] ${
-                        color === c ? "bg-[#111] text-white" : "bg-white"
-                      }`}
-                      title={c}
+                <div className="text-[15px] space-y-[14px]">
+                  <div className="flex items-center">
+                    <div className="w-[90px] text-[#333]">가격</div>
+                    <div className="text-[#111]">{product?.price?.toLocaleString()}원</div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-[90px] text-[#333]">배송비</div>
+                    <div className="text-[#111]">{product?.deliveryFee?.toLocaleString()}원</div>
+                  </div>
+
+                  {/* 색상 */}
+                  <div className="flex items-center">
+                    <div className="w-[90px] text-[#333]">색상</div>
+                    <div className="flex gap-2">
+                      {availableColors.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => handleColorChange(color)}
+                          className={`px-3 h-[28px] border rounded text-[13px] ${
+                            selectedColor === color ? "bg-[#111] text-white" : "bg-white"
+                          }`}
+                          title={color}
+                        >
+                          {color}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 사이즈 */}
+                  <div className="flex items-center">
+                    <div className="w-[90px] text-[#333]">사이즈</div>
+                    <select
+                      value={selectedSize}
+                      onChange={(e) => handleSizeChange(e.target.value)}
+                      className="w-[270px] h-[30px] border rounded px-2 text-[13px] text-[#444]"
                     >
-                      {c}
-                    </button>
-                  ))}
+                      <option value="">[-필수] 옵션을 선택하세요-</option>
+                      {availableSizes.map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* 수량 */}
+                  <div className="flex items-center">
+                    <div className="w-[90px] text-[#333]">수량</div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        className="w-6 h-6 border rounded"
+                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      >
+                        -
+                      </button>
+                      <span className="min-w-[24px] text-center">{quantity}</span>
+                      <button
+                        className="w-6 h-6 border rounded"
+                        onClick={() => setQuantity((q) => q + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              {/* 사이즈 */}
-              <div className="flex items-center">
-                <div className="w-[90px] text-[#333]">사이즈</div>
-                <select
-                  value={size}
-                  onChange={(e) => setSize(e.target.value)}
-                  className="w-[270px] h-[30px] border rounded px-2 text-[13px] text-[#444]"
-                >
-                  <option value="">[-필수] 옵션을 선택하세요-</option>
-                  {product.sizes.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                {/* 구분선 */}
+                <div className="h-px w-full bg-[#e5e7eb] mt-[18px] mb-[14px]" />
 
-              {/* 수량 */}
-              <div className="flex items-center">
-                <div className="w-[90px] text-[#333]">수량</div>
-              <div className="flex items-center gap-3">
-                  <button
-                    className="w-6 h-6 border rounded"
-                    onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  >
-                    -
-                  </button>
-                  <span className="min-w-[24px] text-center">{qty}</span>
-                  <button
-                    className="w-6 h-6 border rounded"
-                    onClick={() => setQty((q) => q + 1)}
-                  >
-                    +
-                  </button>
+                {/* TOTAL + 구매하기 */}
+                <div className="flex items-center">
+                  <div className="text-[14px] tracking-wide text-[#333]">TOTAL</div>
+                  <div className="flex-1" />
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      className="w-[48px] h-[42px] rounded-none"
+                      title="위시리스트"
+                      onClick={() => alert("위시리스트에 담았습니다.")}
+                    >
+                      🤍
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-[48px] h-[42px] rounded-none"
+                      title="장바구니"
+                      onClick={() => navigate("/cart")}
+                    >
+                      👜
+                    </Button>
+                    <Button
+                      className="w-[230px] h-[48px] rounded-none bg-[#b9b9b9] text-white text-[16px] hover:bg-[#a4a4a4]"
+                      onClick={openPayModal}
+                    >
+                      구매하기
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            {/* 구분선 */}
-            <div className="h-px w-full bg-[#e5e7eb] mt-[18px] mb-[14px]" />
-
-            {/* TOTAL + 구매하기 */}
-            <div className="flex items-center">
-              <div className="text-[14px] tracking-wide text-[#333]">TOTAL</div>
-              <div className="flex-1" />
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  className="w-[48px] h-[42px] rounded-none"
-                  title="위시리스트"
-                  onClick={() => alert("위시리스트에 담았습니다.")}
-                >
-                  🤍
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-[48px] h-[42px] rounded-none"
-                  title="장바구니"
-                  onClick={() => navigate("/cart")}
-                >
-                  👜
-                </Button>
-                <Button
-                  className="w-[230px] h-[48px] rounded-none bg-[#b9b9b9] text-white text-[16px] hover:bg-[#a4a4a4]"
-                  onClick={openPayModal}
-                >
-                  구매하기
-                </Button>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
 

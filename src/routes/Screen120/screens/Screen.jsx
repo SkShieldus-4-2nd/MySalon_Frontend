@@ -1,5 +1,5 @@
 // src/routes/Screen120/screens/Screen.jsx
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -13,34 +13,227 @@ import { MenuIcon, SearchIcon } from "lucide-react";
 export const Screen = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({
+    productName: "",
+    description: "",
+    price: "",
+    deliveryPrice: ""
+  });
 
-  const product = useMemo(
-    () =>
-      state?.product ?? {
-        id: "123456789",
-        name: "여름블루 롱 원피스",
-        description:
-          "상품 설명을 입력합니다. 상품 설명을 입력합니다. 상품 설명을 입력합니다.\n상품 설명을 입력합니다. 상품 설명을 입력합니다. 상품 설명을 입력합니다.",
-        price: "50,000 원",
-        shipping: "3,500원",
-        colors: ["Black", "White", "Red"],
-        sizes: ["S", "M", "L"],
-        qty: 2,
-        image: "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png",
-      },
-    [state]
-  );
+  // 상품 데이터 가져오기
+  useEffect(() => {
+    if (state?.product) {
+      setProduct(state.product);
+      // 수정 폼 초기화
+      setEditForm({
+        productName: state.product.productName || "",
+        description: state.product.description || "",
+        price: state.product.price?.toString() || "",
+        deliveryPrice: state.product.deliveryPrice?.toString() || ""
+      });
+    } else {
+      // 기본 더미 데이터
+      const dummyProduct = {
+        productNum: "123456789",
+        productName: "여름블루 롱 원피스",
+        description: "상품 설명을 입력합니다. 상품 설명을 입력합니다. 상품 설명을 입력합니다.\n상품 설명을 입력합니다. 상품 설명을 입력합니다. 상품 설명을 입력합니다.",
+        price: 50000,
+        deliveryPrice: 3500,
+        mainImage: "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png",
+        productDetails: [
+          { color: "Black", size: "S", count: 10 },
+          { color: "Black", size: "M", count: 15 },
+          { color: "White", size: "S", count: 8 },
+          { color: "White", size: "M", count: 12 },
+          { color: "Red", size: "L", count: 5 }
+        ]
+      };
+      setProduct(dummyProduct);
+      setEditForm({
+        productName: dummyProduct.productName,
+        description: dummyProduct.description,
+        price: dummyProduct.price.toString(),
+        deliveryPrice: dummyProduct.deliveryPrice.toString()
+      });
+    }
+  }, [state]);
 
-  const [color, setColor] = useState(product.colors?.[0] ?? "");
-  const [size, setSize] = useState(product.sizes?.[0] ?? "");
-  const [qty, setQty] = useState(product.qty ?? 1);
+  // 선택된 색상과 사이즈에 따른 수량 관리
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedCount, setSelectedCount] = useState(0);
+  const [inputCount, setInputCount] = useState("");
 
-  const inc = () => setQty((n) => Math.min(99, n + 1));
-  const dec = () => setQty((n) => Math.max(1, n - 1));
+  // 상품 데이터가 로드되면 첫 번째 색상으로 초기화
+  useEffect(() => {
+    if (product?.productDetails?.length > 0) {
+      const firstColor = product.productDetails[0].color;
+      setSelectedColor(firstColor);
+      const firstSize = product.productDetails.find(d => d.color === firstColor)?.size || "";
+      setSelectedSize(firstSize);
+      const firstCount = product.productDetails.find(d => d.color === firstColor && d.size === firstSize)?.count || 0;
+      setSelectedCount(firstCount);
+      setInputCount(firstCount.toString());
+    }
+  }, [product]);
+
+  // 선택된 색상에 따른 사이즈 목록
+  const availableSizes = useMemo(() => {
+    if (!product?.productDetails || !selectedColor) return [];
+    return [...new Set(
+      product.productDetails
+        .filter(d => d.color === selectedColor)
+        .map(d => d.size)
+    )];
+  }, [product, selectedColor]);
+
+  // 선택된 색상과 사이즈에 따른 수량
+  const currentCount = useMemo(() => {
+    if (!product?.productDetails || !selectedColor || !selectedSize) return 0;
+    const detail = product.productDetails.find(d => d.color === selectedColor && d.size === selectedSize);
+    return detail?.count || 0;
+  }, [product, selectedColor, selectedSize]);
+
+  // 색상이나 사이즈가 변경될 때 input 값 업데이트
+  useEffect(() => {
+    setInputCount(currentCount.toString());
+  }, [currentCount]);
+
+  // 색상 선택 시 사이즈 초기화
+  const handleColorChange = (color) => {
+    setSelectedColor(color);
+    const firstSize = product.productDetails.find(d => d.color === color)?.size || "";
+    setSelectedSize(firstSize);
+  };
+
+  // 사이즈 선택 시 수량 업데이트
+  const handleSizeChange = (size) => {
+    setSelectedSize(size);
+  };
+
+  // input 값 변경 처리
+  const handleInputCountChange = (e) => {
+    setInputCount(e.target.value);
+  };
+
+  // 수량 수정 (input에서 직접 입력)
+  const handleCountUpdate = async () => {
+    const newCount = parseInt(inputCount);
+    if (isNaN(newCount) || newCount < 0) {
+      alert("올바른 수량을 입력해주세요.");
+      setInputCount(currentCount.toString());
+      return;
+    }
+    
+    setSaving(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/api/product-details/update-count`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productNum: product.productNum,
+          color: selectedColor,
+          size: selectedSize,
+          count: newCount
+        }),
+      });
+
+      if (response.ok) {
+        // 로컬 상태 업데이트
+        setProduct(prev => ({
+          ...prev,
+          productDetails: prev.productDetails.map(d => 
+            d.color === selectedColor && d.size === selectedSize 
+              ? { ...d, count: newCount }
+              : d
+          )
+        }));
+        setSelectedCount(newCount);
+        alert("수량이 수정되었습니다.");
+      } else {
+        alert("수량 수정에 실패했습니다.");
+        setInputCount(currentCount.toString());
+      }
+    } catch (error) {
+      console.error("수량 수정 오류:", error);
+      alert("수량 수정 중 오류가 발생했습니다.");
+      setInputCount(currentCount.toString());
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // 사용 가능한 색상 목록
+  const availableColors = useMemo(() => {
+    if (!product?.productDetails) return [];
+    return [...new Set(product.productDetails.map(d => d.color))];
+  }, [product]);
+
+  // 수정 폼 입력 처리
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // 상품 정보 수정
+  const handleProductUpdate = async () => {
+    if (!product?.productNum) {
+      alert("상품 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/api/products/${product.productNum}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productNum: product.productNum,
+          userNum: product.userNum,
+          productName: editForm.productName,
+          description: editForm.description,
+          price: parseInt(editForm.price),
+          deliveryPrice: parseInt(editForm.deliveryPrice),
+          mainImage: product.mainImage,
+          gender: product.gender,
+          category: product.category,
+          categoryLow: product.categoryLow
+        }),
+      });
+
+      if (response.ok) {
+        const updatedProduct = await response.json();
+        setProduct(updatedProduct);
+        setShowEditModal(false);
+        alert("상품 정보가 수정되었습니다.");
+      } else {
+        alert("상품 수정에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("상품 수정 오류:", error);
+      alert("상품 수정 중 오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleEdit = () => {
-    // 여기서 수정 페이지로 이동하거나 모달을 띄우는 등 원하는 액션 연결
-    alert("수정하기 눌림 (원하는 액션으로 연결하세요)");
+    setShowEditModal(true);
   };
 
   const topNavItems = [
@@ -118,8 +311,10 @@ export const Screen = () => {
           {/* 좌측: 상품 이미지 */}
           <div className="col-span-5 flex justify-center">
             <img
-              src={product.image}
-              alt={product.name}
+              src={product?.mainImage && product.mainImage !== "default.jpg" 
+                ? `http://localhost:8080${product.mainImage}` 
+                : "https://c.animaapp.com/mfey8x558kisvz/img/image-1-2.png"}
+              alt={product?.productName}
               className="w-[420px] h-[560px] object-cover"
             />
           </div>
@@ -127,34 +322,34 @@ export const Screen = () => {
           {/* 우측: 정보 */}
           <div className="col-span-7">
             <h1 className="mb-2 [font-family:'SF_Pro-Bold',Helvetica] text-[28px]">
-              {product.name}
+              {product?.productName}
             </h1>
             <p className="text-[13px] text-[#333] whitespace-pre-line">
-              {product.description}
+              {product?.description}
             </p>
 
             <div className="mt-8 space-y-5 text-[14px]">
               <div className="flex">
                 <div className="w-20 text-[#666]">가격</div>
-                <div className="font-medium">{product.price}</div>
+                <div className="font-medium">{product?.price?.toLocaleString()} 원</div>
               </div>
 
               <div className="flex">
                 <div className="w-20 text-[#666]">배송비</div>
-                <div>{product.shipping ?? "3,000원"}</div>
+                <div>{product?.deliveryPrice?.toLocaleString()} 원</div>
               </div>
 
               <div className="flex items-center">
                 <div className="w-20 text-[#666]">색상</div>
                 <div className="flex gap-2">
-                  {product.colors?.map((c) => (
+                  {availableColors.map((color) => (
                     <Button
-                      key={c}
-                      variant={c === color ? "default" : "outline"}
-                      className={`h-7 px-3 rounded-none ${c === color ? "bg-[#444] hover:bg-[#333]" : ""}`}
-                      onClick={() => setColor(c)}
+                      key={color}
+                      variant={color === selectedColor ? "default" : "outline"}
+                      className={`h-7 px-3 rounded-none ${color === selectedColor ? "bg-[#444] hover:bg-[#333]" : ""}`}
+                      onClick={() => handleColorChange(color)}
                     >
-                      {c}
+                      {color}
                     </Button>
                   ))}
                 </div>
@@ -163,36 +358,35 @@ export const Screen = () => {
               <div className="flex items-center">
                 <div className="w-20 text-[#666]">사이즈</div>
                 <select
-                  value={size}
-                  onChange={(e) => setSize(e.target.value)}
+                  value={selectedSize}
+                  onChange={(e) => handleSizeChange(e.target.value)}
                   className="border border-[#c9c9c9] h-8 px-2"
                 >
-                  {(product.sizes ?? ["S", "M", "L"])
-                    .map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
+                  <option value="">사이즈 선택</option>
+                  {availableSizes.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="flex items-center">
                 <div className="w-20 text-[#666]">수량</div>
                 <div className="flex items-center gap-3">
+                  <Input
+                    type="number"
+                    value={inputCount}
+                    onChange={handleInputCountChange}
+                    className="w-20 h-8 text-center"
+                    min="0"
+                  />
                   <Button
-                    variant="outline"
-                    className="h-8 w-8 rounded-none"
-                    onClick={dec}
+                    onClick={handleCountUpdate}
+                    disabled={saving}
+                    className="h-8 px-3 bg-[#6c6c6c] hover:bg-[#5b5b5b] rounded-none text-white"
                   >
-                    -
-                  </Button>
-                  <span className="w-6 text-center">{qty}</span>
-                  <Button
-                    variant="outline"
-                    className="h-8 w-8 rounded-none"
-                    onClick={inc}
-                  >
-                    +
+                    {saving ? "저장 중..." : "수정"}
                   </Button>
                 </div>
               </div>
@@ -246,6 +440,76 @@ export const Screen = () => {
             </div>
           </div>
         </main>
+
+        {/* 수정 모달 */}
+        {showEditModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-8 rounded-lg w-[500px] max-h-[80vh] overflow-y-auto">
+              <h2 className="text-xl font-bold mb-6">상품 정보 수정</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">상품명</label>
+                  <Input
+                    name="productName"
+                    value={editForm.productName}
+                    onChange={handleEditFormChange}
+                    className="w-full"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">상품 설명</label>
+                  <textarea
+                    name="description"
+                    value={editForm.description}
+                    onChange={handleEditFormChange}
+                    className="w-full border border-gray-300 rounded px-3 py-2 h-24 resize-none"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">가격 (원)</label>
+                  <Input
+                    name="price"
+                    type="number"
+                    value={editForm.price}
+                    onChange={handleEditFormChange}
+                    className="w-full"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">배송비 (원)</label>
+                  <Input
+                    name="deliveryPrice"
+                    type="number"
+                    value={editForm.deliveryPrice}
+                    onChange={handleEditFormChange}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <Button
+                  onClick={handleProductUpdate}
+                  disabled={saving}
+                  className="flex-1 bg-[#6c6c6c] hover:bg-[#5b5b5b] rounded-none"
+                >
+                  {saving ? "저장 중..." : "저장"}
+                </Button>
+                <Button
+                  onClick={() => setShowEditModal(false)}
+                  variant="outline"
+                  className="flex-1 rounded-none"
+                >
+                  취소
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

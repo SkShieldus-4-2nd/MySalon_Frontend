@@ -156,6 +156,7 @@ function AppContent() {
       {/* 판매자 상세 / 구매자 상세 */}
       <Route path="/screen120" element={<Screen120 />} />
       <Route path="/screen126" element={<Screen126 />} />
+      <Route path="/screen126/:productNum" element={<Screen126 />} />
       <Route path="/screen133" element={<Screen133 />} />
       <Route path="/screen145" element={<Screen145 />} />
 
