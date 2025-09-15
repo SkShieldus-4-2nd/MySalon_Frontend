@@ -123,18 +123,45 @@ export const Screen = () => {
                     <div>
                       <div className="text-xs text-gray-500">{item.reviewNum}</div>
                       <div className="text-lg font-bold mt-1">{item.productName}</div>
-                      <div className="text-sm text-gray-500 mt-1">{item.size} / {item.color}</div>
+
+                      {/* ✅ 가격 추가 */}
+                      <div className="text-sm font-semibold text-yellow-600 mt-1">
+                        {item.price?.toLocaleString()} 원
+                      </div>
+
+                      <div className="text-sm text-gray-500 mt-1">
+                        {item.size} / {item.color}
+                      </div>
                       <div className="text-sm mt-2 whitespace-pre-wrap">{item.text}</div>
                     </div>
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex">
-                        {[1, 2, 3, 4, 5].map(i => (
-                          <span key={i} className={`w-5 h-5 ${i <= item.score ? "text-yellow-400" : "text-gray-300"}`}>★</span>
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <span
+                            key={i}
+                            className={`w-5 h-5 ${i <= item.score ? "text-yellow-400" : "text-gray-300"
+                              }`}
+                          >
+                            ★
+                          </span>
                         ))}
                       </div>
                       <Button
                         className="bg-gray-500 hover:bg-gray-600 text-white text-sm px-3 py-1 rounded"
-                        onClick={() => navigate(`/review/edit/${item.reviewNum}`)}
+                        onClick={() =>
+                          navigate("/review", {
+                            state: {
+                              reviewNum: item.reviewNum,
+                              productNum: item.productNum,
+                              productDetailNum: item.productDetailNum,
+                              productName: item.productName,
+                              score: item.score,
+                              text: item.text,
+                              reviewImage: item.reviewImage,
+                              price: item.price, // ✅ 가격도 state로 넘겨줌
+                            },
+                          })
+                        }
                       >
                         리뷰수정
                       </Button>
@@ -142,6 +169,7 @@ export const Screen = () => {
                   </div>
                 </CardContent>
               </Card>
+
             ))}
           </div>
 

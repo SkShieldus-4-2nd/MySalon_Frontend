@@ -36,20 +36,26 @@ const categoryLowMap = {
   "니트/스웨터": "KNIT_SWEATER",
   "맨투맨/후드": "SWEATSHIRT_HOODIE",
   기타: "OTHER",
+
   자켓: "JACKET",
   코트: "COAT",
   가디건: "CARDIGAN",
+
   반바지: "SHORTS",
   청바지: "JEANS",
   슬랙스: "SLACKS",
+
   미니: "MINI",
   미디: "MIDI",
   롱: "LONG",
+
   가방: "BAG",
   악세사리: "ACCESSORY",
   모자: "HAT",
+
   잠옷: "PAJAMAS",
   속옷: "UNDERWEAR",
+  
   상의: "TOPS",
   하의: "BOTTOMS",
 
