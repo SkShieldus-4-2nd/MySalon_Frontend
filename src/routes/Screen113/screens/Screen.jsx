@@ -52,9 +52,11 @@ export const Screen = () => {
         const data = await response.json();
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("role", data.user.type || "BUYER");
 
         alert("로그인 성공!");
 
+        // 사용자 역할에 따른 리다이렉트
         if (data.user.type === "SELLER") {
           navigate("/admin-mypage");
         } else {
